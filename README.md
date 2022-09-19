@@ -1,6 +1,6 @@
 ## Healthy Longevity Initiative
 
-# **The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions**
+# The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions
 
 Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup>2</sup>, Diego S. Cardoso<sup>3</sup>, Gretchen A. Stevens<sup>4</sup>
 
@@ -19,56 +19,56 @@ The following text provides an outline of the analysis steps and guides users th
 
 Scripts with prefix `1-` are data cleaning scripts, which primarily filter the input data to the countries, years, and causes of death that are of relevance for this analysis.
 
-**Note:** The input data used in data cleaning scripts were pre-processed at basic, perfunctory level. The raw data was not uploaded to this repository due to size limitations; however the code to clean the raw data can be reviewed here: `init/raw-data-cleaning.R`.
+Note: The input data used in data cleaning scripts were pre-processed at basic, perfunctory level. The raw data was not uploaded to this repository due to size limitations; however the code to clean the raw data can be reviewed here: `init/raw-data-cleaning.R`.
 
 ### 1-1. Country eligibility
 
-**Script:** `1-1_country-eligibility.R`
+Script: `1-1_country-eligibility.R`
 
-**Objective:** Defines and applies the eligibility criteria for inclusion in the analysis.
+Objective: Defines and applies the eligibility criteria for inclusion in the analysis.
 
 Countries were eligible for inclusion in the analysis if they had populations of at least five million in 2020. Of those countries with populations of at least five million, a smaller subset were eligible for the frontier analysis if they had (a) high-quality vital registration data and (b) were not excluded from the GHE 2019 analysis.
 
-**Input:**
+Input:
 
 -   `data/input/ghe_*.csv`
 -   `data/input/population.csv`
 -   `data/input/quality.csv`
 -   `data/input/region.csv`
 
-**Output:**
+Output:
 
 -   `data/processed/country_info.Rda`
 -   `data/processed/ghe.Rda`
 
 ### 1-2. Population
 
-**Script:** `1-2_population.R`
+Script: `1-2_population.R`
 
-**Objective:** Filters population data to countries and years of interest; calculates total population (i.e., not stratified by age and sex) and alpha.
+Objective: Filters population data to countries and years of interest; calculates total population (i.e., not stratified by age and sex) and alpha.
 
-**Input:**
+Input:
 
 -   `data/processed/country_info.Rda`
 -   `data/input/population.csv`
 
-**Output:**
+Output:
 
 -   `data/processed/population.Rda`
 
 ### 1-3. GHE recode
 
-**Script:** `1-3_ghe-recode.R`
+Script: `1-3_ghe-recode.R`
 
-**Objective:** Recodes the GHE cause of death data so that causes classify as a mutually exclusive and collectively exhaustive set of causes that are of relevance for this analysis.
+Objective: Recodes the GHE cause of death data so that causes classify as a mutually exclusive and collectively exhaustive set of causes that are of relevance for this analysis.
 
 This script also creates two reference data frames: one containing the organizational hierarchy of recoded causes and the other containing a recode map.
 
-**Input:**
+Input:
 
 -   `data/processed/ghe.Rda`
 
-**Output:**
+Output:
 
 -   `data/processed/ghe_recoded.Rda`
 -   `data/processed/cause_hierarchy.Rda`
@@ -80,15 +80,22 @@ Scripts with prefix `2-` are those which contribute to the development of the mo
 
 ### 2-1. Frontier extraction
 
-Script: `2-1_frontier-extraction.R`
+**Script:** `2-1_frontier-extraction.R`
 
 **Objective:** Extract the 10th percentile of age-cause-specific mortality.
 
 This script takes the recoded GHE data for frontier-eligible countries, calculates age-cause-specific mortality rates, and the extracts the frontier using a 10th percentile definition. It then harmonizes (or scales) the frontier using a level-wise approach, such that mortality from lower level causes of death sum to mortality from higher level causes of death.
 
-Input:
+**Input:**
 
-Output:
+-   `data/processed/country_info.Rda`
+-   `data/processed/ghe_recoded.Rda`
+-   `data/processed/population.Rda`
+
+**Output:**
+
+-   `data/processed/frontier_harmonized.Rda`
+-   `data/processed/frontier_analysis_info.Rda`
 
 ### 2-2. Frontier projection
 
