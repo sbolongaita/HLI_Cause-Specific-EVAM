@@ -369,9 +369,9 @@ pre code {
 <h3>Healthy Longevity Initiative</h3>
 </div>
 <div id="the-economic-value-associated-with-non-communicable-disease-mortality-a-systematic-assessment-by-cause-of-death-across-world-regions" class="section level1">
-<h1>The economic value associated with non-communicable disease
+<h1><strong>The economic value associated with non-communicable disease
 mortality: a systematic assessment by cause of death across world
-regions</h1>
+regions</strong></h1>
 <p>Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y.
 Chang<sup>2</sup>, Diego S. Cardoso<sup>3</sup>, Gretchen A.
 Stevens<sup>4</sup></p>
@@ -395,19 +395,19 @@ repository.</p>
 </div>
 <div id="data-cleaning" class="section level3">
 <h3>1. Data cleaning</h3>
-<p>Scripts with prefixes between 100-199 are data cleaning scripts,
-which primarily filter the input data to the countries and years of
-relevance for this analysis.</p>
-<p>Note: The input data used in data cleaning scripts were pre-processed
-at basic, perfunctory level. The raw data was not uploaded to this
-repository due to size limitations; however the code to clean the raw
-data can be reviewed here: <code>init/raw-data-cleaning.R</code>.</p>
+<p>Scripts with prefix <code>1-</code> are data cleaning scripts, which
+primarily filter the input data to the countries, years, and causes of
+death that are of relevance for this analysis.</p>
+<p><strong>Note:</strong> The input data used in data cleaning scripts
+were pre-processed at basic, perfunctory level. The raw data was not
+uploaded to this repository due to size limitations; however the code to
+clean the raw data can be reviewed here:
+<code>init/raw-data-cleaning.R</code>.</p>
 <div id="country-eligibility" class="section level4">
 <h4>1-1. Country Eligibility</h4>
-<p><strong>Script:</strong>
-<code>1-1_country-eligibility.R</code><strong>Objective:</strong>
-Defines and applies the eligibility criteria for inclusion in the
-analysis.</p>
+<p><strong>Script:</strong> <code>1-1_country-eligibility.R</code></p>
+<p><strong>Objective:</strong> Defines and applies the eligibility
+criteria for inclusion in the analysis.</p>
 <p>Countries were eligible for inclusion in the analysis if they had
 populations of at least five million in 2020. Of those countries with
 populations of at least five million, a smaller subset were eligible for
@@ -415,10 +415,10 @@ the frontier analysis if they had (a) high-quality vital registration
 data and (b) were not excluded from the GHE 2019 analysis.</p>
 <p><strong>Input:</strong></p>
 <ul>
-<li><p><code>data/input/ghe_*.csv</code></p></li>
-<li><p><code>data/input/population.csv</code></p></li>
-<li><p><code>data/input/quality.csv</code></p></li>
-<li><p><code>data/input/region.csv</code></p></li>
+<li><code>data/input/ghe_*.csv</code></li>
+<li><code>data/input/population.csv</code></li>
+<li><code>data/input/quality.csv</code></li>
+<li><code>data/input/region.csv</code></li>
 </ul>
 <p><strong>Output:</strong></p>
 <ul>
@@ -429,7 +429,38 @@ data and (b) were not excluded from the GHE 2019 analysis.</p>
 <div id="population" class="section level4">
 <h4>1-2. Population</h4>
 <p><strong>Script:</strong> <code>1-2_population.R</code></p>
-<p>Objective:</p>
+<p><strong>Objective:</strong> Filters population data to countries and
+years of interest; calculates total population (i.e., not stratified by
+age and sex) and alpha.</p>
+<p><strong>Input:</strong></p>
+<ul>
+<li><code>data/processed/country_info.Rda</code></li>
+<li><code>data/input/population.csv</code></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul>
+<li><code>data/processed/population.Rda</code></li>
+</ul>
+</div>
+<div id="ghe-recode" class="section level4">
+<h4>1-3. GHE Recode</h4>
+<p><strong>Script:</strong> <code>1-3_ghe-recode.R</code></p>
+<p><strong>Objective:</strong> Recodes the GHE cause of death data so
+that causes classify as a mutually exclusive and collectively exhaustive
+set of causes that are of relevance for this analysis.</p>
+<p>This script also creates two reference data frames: one containing
+the organizational hierarchy of recoded causes and the other containing
+a recode map.</p>
+<p><strong>Input:</strong></p>
+<ul>
+<li><code>data/processed/ghe.Rda</code></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul>
+<li><code>data/processed/ghe_recoded.Rda</code></li>
+<li><code>data/processed/cause_hierarchy.Rda</code></li>
+<li><code>data/processed/cause_recode_map.Rda</code></li>
+</ul>
 </div>
 </div>
 </div>

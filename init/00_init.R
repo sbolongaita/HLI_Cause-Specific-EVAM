@@ -20,7 +20,7 @@ packages <- c(
   "gridExtra", "gtools", "haven", "Hmisc",
   # I, J, K, L
   # M, N, O, P
-  "openxlsx", "plyr", "purrr",
+  "magrittr", "openxlsx", "plyr", "purrr",
   # Q, R, S, T
   "reader", "remotes", "renv", "scales", "shades", "stringr", "sysfonts", "tidyr",
   # Last load packages

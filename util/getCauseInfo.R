@@ -1,9 +1,9 @@
 library(dplyr)
 library(SarahB)
 
-getCauseInfo <- function(x, lookup = "ghecause", return = "causename"){
+getCauseInfo <- function(.data, lookup = "ghecause", return = "causename"){
 
-  load("data/processed/cause_hierarchy.Rda")
+  base::load("data/processed/cause_hierarchy.Rda")
 
   if(lookup %notin% c("prefix", "ghecause", "causename")){
     stop("Invalid input vector")
@@ -17,7 +17,7 @@ getCauseInfo <- function(x, lookup = "ghecause", return = "causename"){
   Return <- cause_hierarchy %>% dplyr::pull(return) %>% as.character()
   Return <- setNames(Return, Lookup)
 
-  z <- unname(Return[as.character(x)])
+  z <- Return[as.character(.data[[lookup]])]
   return(z)
 
 }
