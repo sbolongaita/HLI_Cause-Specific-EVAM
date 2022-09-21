@@ -1,15 +1,6 @@
 
 ### Healthy Longevity Initiative
-### 220 - FRONTIER PROJECTION
-
-# This script takes the harmonized frontier mortality rates for 2000-2019
-# and projects them into the future using ordinary least squares linear
-# regression, unless there are stochastic concerns or a positive trend line
-# from the regression, in which case an average is used.
-
-# Returns:
-# • output_data/frontier_projected.Rda (R dataset)
-# • output_data/frontier_projection_info.Rda (R dataset)
+### 2-2 Frontier projection
 
 
 

@@ -82,7 +82,7 @@ Scripts with prefix `2-` are those analyze and develop the mortality frontiers.
 
 ****Script:**** `2-1_frontier-extraction.R`
 
-****Objective:**** Extract the 10th percentile of age-cause-specific mortality.
+****Objective:**** Extract the 10th percentile of age-cause-specific mortality (i.e., the frontier).
 
 This script takes the recoded GHE data for frontier-eligible countries, calculates age-cause-specific mortality rates, and the extracts the frontier using a 10th percentile definition. It then harmonizes (or scales) the frontier using a level-wise approach, such that mortality from lower level causes of death sum to mortality from higher level causes of death.
 
@@ -102,25 +102,37 @@ This script takes the recoded GHE data for frontier-eligible countries, calculat
 
 **Script:** `2-2_frontier-projection.R`
 
-**Objective:**
+**Objective:** Project the age-cause-specific mortality frontiers into the future (2045)
+
+This script takes the harmonized frontier mortality rates for 2000-2019 and projects them into the future using ordinary least squares linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case an average is used.
 
 **Input:**
--   `data/processed/country_info.R/`
--   `data/processed/frontier_harmonized.R/`
--   `data/processed/frontier_extraction_info.R/`
--   `data/processed/population.R/`
+-   `data/processed/country_info.R`
+-   `data/processed/frontier_harmonized.R`
+-   `data/processed/frontier_extraction_info.R`
+-   `data/processed/population.R`
 
 **Output:**
+-   `data/processed/frontier_projected.R`
+-   `data/processed/frotier_projection_info.R`
 
 ### 2-3. Frontier scaling
 
-**Script:**
+**Script:** `2-3_frontier_scaling.R`
 
-**Objective:**
+**Objective:** Scale the age-cause-specific mortality frontiers with Chang et al. (2022) longevity frontiers
+
+This script takes the harmonized and projected frontier mortality rates and scales them with the demographic longevity frontiers of an accompanying HLI paper, Chang et al. (2022), based on UN Population data. 
 
 **Input:**
+-   `data/processed/country_info.R`
+-   `data/processed/frontier_harmonized.R`
+-   `data/processed/frontier_extraction_info.R`
+-   `data/processed/population.R`
 
 **Output:**
+-   `data/processed/Chang_scaling_factors.R`
+-   `data/processed/frontier_scaled.R`
 
 ## 3. Country and Region Analyses
 
