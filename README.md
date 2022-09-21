@@ -107,14 +107,14 @@ This script takes the recoded GHE data for frontier-eligible countries, calculat
 This script takes the harmonized frontier mortality rates for 2000-2019 and projects them into the future using ordinary least squares linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case an average is used.
 
 **Input:**
--   `data/processed/country_info.R`
--   `data/processed/frontier_harmonized.R`
--   `data/processed/frontier_extraction_info.R`
--   `data/processed/population.R`
+-   `data/processed/country_info.Rda`
+-   `data/processed/frontier_harmonized.Rda`
+-   `data/processed/frontier_extraction_info.Rda`
+-   `data/processed/population.Rda`
 
 **Output:**
--   `data/processed/frontier_projected.R`
--   `data/processed/frotier_projection_info.R`
+-   `data/processed/frontier_projected.Rda`
+-   `data/processed/frotier_projection_info.Rda`
 
 ### 2-3. Frontier scaling
 
@@ -125,46 +125,65 @@ This script takes the harmonized frontier mortality rates for 2000-2019 and proj
 This script takes the harmonized and projected frontier mortality rates and scales them with the demographic longevity frontiers of an accompanying HLI paper, Chang et al. (2022), based on UN Population data. 
 
 **Input:**
--   `data/processed/country_info.R`
--   `data/processed/frontier_harmonized.R`
--   `data/processed/frontier_extraction_info.R`
--   `data/processed/population.R`
+-   `data/processed/country_info.Rda`
+-   `data/processed/frontier_harmonized.Rda`
+-   `data/processed/frontier_extraction_info.Rda`
+-   `data/processed/population.Rda`
 
 **Output:**
--   `data/processed/Chang_scaling_factors.R`
--   `data/processed/frontier_scaled.R`
+-   `data/processed/chang_scaling_factors.Rda`
+-   `data/processed/frontier_scaled.Rda`
 
 ## 3. Country and Region Analyses
 
 ### 3-1. Country projection
 
-**Script:**
+**Script:** `3-1_country-projection.R`
 
-**Objective:**
+**Objective:** Project the country age-cause-specific mortality rates into the future (2045)
+
+This script takes country mortality rates for 2000-2019 and projects them into the future using ordinary least squares linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case an average is used. This method is the same as the method used for the frontier projections.
 
 **Input:**
+-   `data/processed/country_info.Rda`
+-   `data/processed/ghe_recoded.Rda`
+-   `data/processed/population.Rda`
 
 **Output:**
+-   `data/processed/country_projected.Rda`
+-   `data/processed/country_projection_info.Rda`
 
 ### 3-2. Country scaling
 
-**Script:**
+**Script:** `3-2_country-projection.R`
 
-**Objective:**
+**Objective:** Scale country mortality rates with Chang et al. (2022) longevity frontiers
+
+This script takes the projected country mortality rates and scales them with the demographic longevity frontiers of an accompanying HLI paper, Chang et al. (2022), based on UN Population data. 
 
 **Input:**
+-   `data/processed/country_info.Rda`
+-   `data/processed/country_projected.Rda`
+-   `data/processed/population.Rda`
 
 **Output:**
+-   `data/processed/country_scaled.Rda`
 
 ### 3-3. Region aggregation
 
-**Script:**
+**Script:** `3-3_region-aggregation.Rda`
 
-**Objective:**
+**Objective:** Calculates the regional mortality rates
+
+This script takes the scaled country projections and calculates the population-weighted average mortality rate by region.
 
 **Input:**
+-   `data/processed/country_info.Rda`
+-   `data/processed/country_scaled.Rda`
+-   `data/processed/population.Rda`
 
 **Output:**
+-   `data/processed/region.Rda`
 
 ## 4. Calculations
 
