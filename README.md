@@ -187,22 +187,35 @@ This script takes the scaled country projections and calculates the population-w
 
 ## 4. Calculations
 
-### 5-1. Country calculations
+### 4-1. Country calculations
 
-**Script:**
-
-**Objective:**
-
-**Input:**
-
-**Output:**
-
-### 5-2. Region calculations
-
-**Script:**
+**Script:** `4-1_country-calculations.R`
 
 **Objective:**
 
 **Input:**
+-   `data/processed/country_scaled.Rda`
+-   `data/processed/frontier_scaled.Rda`
+-   `data/processed/population.Rda`
+-   `data/input/gni.csv`
 
 **Output:**
+-   `data/processed/country_calculations.Rda`
+-   `output/data/country_calculations.Rda`
+
+### 4-2. Region calculations
+
+**Script:** `4-2_region-calculations.Rda`
+
+**Objective:**
+
+**Input:**
+-   `data/processed/country_info.Rda`
+-   `data/processed/frontier_scaled.Rda`
+-   `data/processed/population.Rda`
+-   `data/processed/region.Rda`
+-   `data/input/gni.csv`
+
+**Output:**
+-   `data/processed/region_calculations.Rda`
+-   `output/data/region_calculations.Rda`
