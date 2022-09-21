@@ -1,16 +1,6 @@
 
 ### Healthy Longevity Initiative
-### 210 - FRONTIER ANALYSIS
-
-# This script takes the recoded cause of death data for frontier-eligible
-# countries, calculates age-cause-specific mortality rates, and the extracts
-# the frontier using a 10th percentile definition. It then harmonizes (or
-# scales) the frontier using a level-wise approach.
-
-# Returns:
-# • output_data/frontier_base.R (R dataset)
-# • output_data/frontier_harmonized.Rda (R dataset)
-# • output_data/frontier_analysis_info.R (R dataset)
+### 2-1 Frontier extraction
 
 
 
@@ -119,7 +109,7 @@ sarahSave("frontier_harmonized", folder = "data/processed")
 # groups that were at or below a given frontier for a given year, as well as
 # scaling factors for the frontiers
 
-frontier_analysis_info <- ghe_recoded %>%
+frontier_extraction_info <- ghe_recoded %>%
   dplyr::mutate(sex_match = ifelse(causename %in% sex.specific, sex, NA)) %>%
   left_join(frontier_base %>% dplyr::rename(sex_match = sex, frontier_base = frontier),
             by = c("year", "age", "ghecause", "causename", "sex_match")) %>%
@@ -129,5 +119,5 @@ frontier_analysis_info <- ghe_recoded %>%
   dplyr::select(year, sex_match, age, ghecause, causename, frontier_base, frontier_harmonized = frontier, iso3, sex, dths_rate) %>%
   arrange(year, age, ghecause, sex_match, dths_rate)
 
-# __+ frontier_analysis_info ----------------------------------------------
-sarahSave("frontier_analysis_info", folder = "data/processed")
+# __+ frontier_extraction_info ----------------------------------------------
+sarahSave("frontier_extraction_info", folder = "data/processed")
