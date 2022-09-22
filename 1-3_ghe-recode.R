@@ -7,6 +7,8 @@
 # two reference data frames: one which defines the organizational hierarchy
 # of recoded causes and the other which contains a recode map.
 
+
+
 # 1.  Loading data --------------------------------------------------------
 
 # Applying the standard project environment
@@ -17,7 +19,7 @@ sarahLoad("ghe", folder = "data/processed")
 
 
 
-# 2 RECODING CAUSES -------------------------------------------------------
+# 2.  Recoding causes -----------------------------------------------------
 
 # Creating new ghecause and causename variables
 temp1 <- ghe %>%
@@ -40,7 +42,7 @@ temp3 <- temp2 %>%
   mutate(ghecause2 = ifelse(ghecause2 %in% c(790, 810, 940, 1020, 1260, 1330, 1340, 1400, 1470, 1505), 600600, ghecause2)) %>%
   mutate(causename2 = ifelse(ghecause2 == 600600, "Other noncommunicable diseases", causename2))
 
-# * 2.2(a) Level 2: Malignant neoplasms -----------------------------------
+# ** 2.2(a) Level 2: Malignant neoplasms ----------------------------------
 temp4 <- temp3 %>%
   # Removing level 4 malignant neoplasm causes
   filter(ghecause2 %notin% c(621:623, 661:664, 691:692, 761:763)) %>%
@@ -48,7 +50,7 @@ temp4 <- temp3 %>%
   mutate(ghecause2 = ifelse(ghecause2 %in% c(650, 670, 690, 720:780), 610610, ghecause2)) %>%
   mutate(causename2 = ifelse(ghecause2 == 610610, "Other malignant neoplasms", causename2))
 
-# * 2.2(b) Level 2: Mental and substance use disorders --------------------
+# ** 2.2(b) Level 2: Mental and substance use disorders -------------------
 temp5 <- temp4 %>%
   # Removing level 4 mental and substance use disorder causes
   filter(ghecause2 %notin% c(831:832, 871:875, 911:912)) %>%
@@ -56,7 +58,7 @@ temp5 <- temp4 %>%
   mutate(ghecause2 = ifelse(ghecause2 %in% c(830:850, 870:930), 820820, ghecause2)) %>%
   mutate(causename2 = ifelse(ghecause2 == 820820, "Other mental and substance use disorders", causename2))
 
-# * 2.2(c) Level 2: Cardiovascular diseases -------------------------------
+# ** 2.2(c) Level 2: Cardiovascular diseases ------------------------------
 temp6 <- temp5 %>%
   # Removing level 4 cardiovascular diseases causes
   filter(ghecause2 %notin% c(1141, 1142)) %>%
@@ -64,13 +66,13 @@ temp6 <- temp5 %>%
   mutate(ghecause2 = ifelse(ghecause2 %in% c(1110:1120, 1150:1160), 11001100, ghecause2)) %>%
   mutate(causename2 = ifelse(ghecause2 == 11001100, "Other cardiovascular diseases", causename2))
 
-# * 2.2(d) Level 2: Respiratory diseases ----------------------------------
+# ** 2.2(d) Level 2: Respiratory diseases ---------------------------------
 temp7 <- temp6 %>%
   # Re-coding level 3 respiratory diseases causes that aren't of interest
   mutate(ghecause2 = ifelse(ghecause2 %in% c(1190:1200), 11701170, ghecause2)) %>%
   mutate(causename2 = ifelse(ghecause2 == 11701170, "Other respiratory diseases", causename2))
 
-# * 2.2(e) Level 2: Digestive diseases -------------------------------------
+# ** 2.2(e) Level 2: Digestive diseases ------------------------------------
 temp8 <- temp7 %>%
   # Removing level 4 digestive disease causes
   filter(ghecause2 %notin% c(1231:1234)) %>%
@@ -84,7 +86,7 @@ temp9 <- temp8 %>%
   # Removing level 3 causes that are under level 2 causes that aren't of interest
   filter(ghecause2 %notin% c(1610:1630))
 
-# * 2.3(a) Level 2: Unintentional injuries --------------------------------
+# ** 2.3(a) Level 2: Unintentional injuries -------------------------------
 temp10 <- temp9 %>%
   # Re-coding level 3 unintentional injuries causes that aren't of interest
   mutate(ghecause2 = ifelse(ghecause2 %in% c(1540:1590), 15201520, ghecause2)) %>%
@@ -112,17 +114,21 @@ sarahSave("ghe_recoded", folder = "data/processed")
 
 
 
-# 3 CAUSE RECODE MAP & CAUSE HIERARCHY ------------------------------------
 
-# * 3.1 Cause recode map --------------------------------------------------
+# 3. Cause recode map -----------------------------------------------------
+
 cause_recode_map <- temp10 %>%
   select(original_ghecause = ghecause, original_causename = causename,
          recoded_ghecause = ghecause2, recoded_causename = causename2) %>%
   unique() %>%
   dplyr::select(starts_with("original"), starts_with("recoded"))
 
+# __+ cause_recode_map ----------------------------------------------------
+sarahSave("cause_recode_map", folder = "data/processed")
 
-# * 3.2 Cause hierarchy ---------------------------------------------------
+
+
+# 4.  Cause hierarchy -----------------------------------------------------
 
 temp1 <- ghe_recoded %>%
   dplyr::select(ghecause, causename) %>%
@@ -211,6 +217,4 @@ cause_hierarchy <- temp5 %>%
   arrange(prefix)
 
 # __+ cause_hierarchy -----------------------------------------------------
-# __+ cause_recode_map ----------------------------------------------------
-sarahSave(c("cause_hierarchy", "cause_recode_map"), folder = "data/processed")
-
+sarahSave("cause_hierarchy", folder = "data/processed")

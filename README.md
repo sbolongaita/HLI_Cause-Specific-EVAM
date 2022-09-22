@@ -78,7 +78,7 @@ Scripts with prefix `2-` analyze and develop the age- and cause-specific mortali
 
 ### 2-1. Frontier extraction
 
-### `2-1_frontier-extraction.R`
+**Script:** `2-1_frontier-extraction.R`
 
 ****Objective:**** Extract the 10th percentile of age-cause-specific mortality (i.e., the frontier).
 
