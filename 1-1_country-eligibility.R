@@ -1,11 +1,18 @@
 
-### Healthy Longevity Initiative
 ### 1.1 Country Eligibility
 
+# This script defines and applies the eligibility criteria for country
+# inclusion in the analysis. Countries were eligible for inclusion if
+# they had populations of at least five million in 2020. Of those countries
+# with populations of at least five million, a smaller subset were eligible
+# for the frontier analysis: those with high-quality vital registration
+# data and which were not excluded from the GHE 2019 analysis.
 
 
-# 1 INPUT DATA ------------------------------------------------------------
 
+# 1. Loading data ---------------------------------------------------------
+
+# Applying the standard project environment
 applyEnv()
 
 # Loading data
@@ -26,17 +33,15 @@ for(name in names){
 
 
 
-# 2 INCLUSION CRITERIA ----------------------------------------------------
 
-# Getting the starting list of countries (countries in GHE dataset) and
+# 2.  Defining inclusion criteria -----------------------------------------
+
+# Extracting the starting list of countries (countries in GHE dataset) and
 # combining with the HLI region data
 temp1 <- data.frame(iso3 = sort(unique(ghe$iso3))) %>%
   left_join(region, by = "iso3") %>%
   mutate(country = getCountry(iso3)) %>%
   dplyr::select(region, iso3, country)
-
-
-# * 2.1 Defining inclusion criteria ---------------------------------------
 
 # Countries with populations of at least 5 million
 pop_iso3 <- population %>%
@@ -80,7 +85,7 @@ sarahSave("country_info", folder = "data/processed")
 
 
 
-# 3 APPLYING INCLUSION CRITERIA -------------------------------------------
+# 3 Applying inclusion criteria -------------------------------------------
 
 # Creating a GHE dataset with analysis countries
 ghe <- ghe %>%

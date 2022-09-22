@@ -1,6 +1,6 @@
 
 ### Healthy Longevity Initiative
-### 00 INITIALIZATION
+### 00 Initialization
 
 
 
@@ -35,7 +35,8 @@ SarahB::loadPackages(packages)
 # 2 UTILITY SCRIPTS -------------------------------------------------------
 # Running utility scripts
 
-scripts <- c(list.files("util", full.names = TRUE))
+scripts <- c(list.files("scr", full.names = TRUE))
+scripts <- scripts[!grepl("raw", scripts)]
 for(script in scripts){
   source(script)
 }
@@ -50,5 +51,5 @@ renv::snapshot()
 
 # Saving the default global environment
 environment <- ls()
-save(environment, file = "init/environment.Rda")
-save.image(file = "init/environment.RData")
+save(environment, file = "config/environment.Rda")
+save.image(file = "config/environment.RData")

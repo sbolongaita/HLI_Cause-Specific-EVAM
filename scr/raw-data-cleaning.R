@@ -1,9 +1,8 @@
 
 # This script cleans the raw data at a basic, perfunctory level. The raw
-# data is not uploaded to the Github for the sake of user simplicity and
+# data is not uploaded to DropBox for the sake of user simplicity and
 # because many of the files are too large. The outputs of this script populate
 # the "data/input" folder and are used in all subsequent analysis scripts.
-
 
 # Regions
 temp1 <- read.csv("data/raw/HLI_regions.csv", as.is = TRUE) %>%

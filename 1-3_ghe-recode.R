@@ -1,11 +1,15 @@
 
-### Healthy Longevity Initiative
 ### 1-3. GHE Recode
 
+# This script recodes the processed GHE cause of death data (limited to
+# analysis countries) so that causes of death are relevant for this analysis,
+# mutually exclusive, and collectively exhaustive. This script then creates
+# two reference data frames: one which defines the organizational hierarchy
+# of recoded causes and the other which contains a recode map.
 
+# 1.  Loading data --------------------------------------------------------
 
-# 1 ENVIRONMENT -----------------------------------------------------------
-
+# Applying the standard project environment
 applyEnv()
 
 # Loading data

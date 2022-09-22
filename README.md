@@ -19,27 +19,25 @@ The following text provides an outline of the analysis steps and guides users th
 
 ## 1. Data Cleaning
 
-Scripts with prefix `1-` are data cleaning scripts, which primarily filter the input data to the countries, years, and causes of death that are of relevance for this analysis.
+Scripts with prefix `1-` clean the data by filtering it to the countries, years, and causes of death that are relevant for the analysis.
 
-**Note:** The input data used in data cleaning scripts were pre-processed at basic, perfunctory level. The raw data was not uploaded to this repository due to size limitations; however the code to clean the raw data can be reviewed here: `init/raw-data-cleaning.R`.
+**Note:** Input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/hkkbubjtbnxj070/AACpj4CQk6dyKpIJ63XVX4Ola?dl=0). These input data were pre-processed at basic, perfunctory level. The raw data will not be provided, however the code to pre-process the raw data can be reviewed here: `scr/raw-data-cleaning.R`.
 
 ### 1-1. Country eligibility
 
 **Script:** `1-1_country-eligibility.R`
 
-**Objective:** Defines and applies the eligibility criteria for inclusion in the analysis.
+**Objective:** Define and apply the eligibility criteria for inclusion in the analysis
 
-Countries were eligible for inclusion in the analysis if they had populations of at least five million in 2020. Of those countries with populations of at least five million, a smaller subset were eligible for the frontier analysis if they had (a) high-quality vital registration data and (b) were not excluded from the GHE 2019 analysis.
+This script defines and applies the eligibility criteria for country inclusion in the analysis. Countries were eligible for inclusion if they had populations of at least five million in 2020. Of those countries with populations of at least five million, a smaller subset were eligible for the frontier analysis: those with high-quality vital registration data and which were not excluded from the GHE 2019 analysis.
 
 **Input:**
-
 -   `data/input/ghe_*.csv`
 -   `data/input/population.csv`
 -   `data/input/quality.csv`
 -   `data/input/region.csv`
 
 **Output:**
-
 -   `data/processed/country_info.Rda`
 -   `data/processed/ghe.Rda`
 
@@ -47,38 +45,36 @@ Countries were eligible for inclusion in the analysis if they had populations of
 
 **Script:** `1-2_population.R`
 
-**Objective:** Filters population data to countries and years of interest; calculates total population (i.e., not stratified by age and sex) and alpha.
+**Objective:** Filter the input population data to countries of interest
+
+This script filters the input population data to the countries of interest based on the inclusion criteria applied in `1-1_country-eligibility.R`. It then calculates the total population for countries and regions (i.e., not stratified by age and sex), as well alpha (i.e., the proportion of the total population that a given age-sex group comprises).
 
 **Input:**
-
 -   `data/processed/country_info.Rda`
 -   `data/input/population.csv`
 
 **Output:**
-
 -   `data/processed/population.Rda`
 
 ### 1-3. GHE recode
 
 **Script:** `1-3_ghe-recode.R`
 
-**Objective:** Recodes the GHE cause of death data so that causes classify as a mutually exclusive and collectively exhaustive set of causes that are of relevance for this analysis.
+**Objective:** Recode the GHE cause of death data so that causes of death are relevant for this analysis, mutually exclusive, and collectively exhaustive
 
-This script also creates two reference data frames: one containing the organizational hierarchy of recoded causes and the other containing a recode map.
+This script recodes the processed GHE cause of death data (limited to analysis countries) so that causes of death are relevant for this analysis, mutually exclusive, and collectively exhaustive. This script then creates two reference data frames: one which defines the organizational hierarchy of recoded causes and the other which contains a recode map.
 
 **Input:**
-
 -   `data/processed/ghe.Rda`
 
 **Output:**
-
 -   `data/processed/ghe_recoded.Rda`
 -   `data/processed/cause_hierarchy.Rda`
 -   `data/processed/cause_recode_map.Rda`
 
 ## 2. Frontier Analysis
 
-Scripts with prefix `2-` are those analyze and develop the mortality frontiers.
+Scripts with prefix `2-` analyze and develop the age- and cause-specific mortality frontiers.
 
 ### 2-1. Frontier extraction
 

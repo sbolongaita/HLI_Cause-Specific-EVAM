@@ -15,4 +15,4 @@ packages <- c(
   "dplyr"
 )
 suppressPackageStartupMessages(SarahB::loadPackages(packages))
-base::load("init/environment.Rdata", envir = globalenv())
+base::load("config/environment.Rdata", envir = globalenv())
