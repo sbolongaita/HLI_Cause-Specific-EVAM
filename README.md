@@ -11,7 +11,9 @@ Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup
 
 ## Description
 
-This Git Hub repository contains the analysis code for an academic paper entitled, *The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions*, which was published in [ journal ] as part of the World Bank's Healthy Longevity Initiative.
+This Git Hub repository contains the analysis code for an academic paper entitled, *The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative in 2022 and published in [journal] on [date].
+
+The input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/hkkbubjtbnxj070/AACpj4CQk6dyKpIJ63XVX4Ola?dl=0).
 
 The following text provides an outline of the analysis steps and guides users through the accompanying code stored in this repository.
 
