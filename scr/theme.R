@@ -44,7 +44,7 @@ barlow <- theme(
   axis.ticks = element_line(color = alpha("black", 0.2), size = 0.2),
   # Legend settings
   legend.title = element_text(size = 12),
-  legend.text = element_text(size = 12),
+  legend.text = element_text(),
   legend.text.align = 0,
   legend.margin = margin(5, 5, 5, 5),
   legend.background = element_rect(),
@@ -53,7 +53,7 @@ barlow <- theme(
   # Strip text settings (facet plots)
   strip.background = element_rect(fill = alpha("black", 0.1)),
   strip.placement = "outside",
-  strip.text = element_text(size = 12, hjust = 0.5, vjust = 0, margin = margin(5, 5, 5, 5))
+  strip.text = element_text(size = 12, hjust = 0.5, vjust = 0.5, margin = margin(5, 5, 5, 5))
 )
 
 # Setting the ggplot theme

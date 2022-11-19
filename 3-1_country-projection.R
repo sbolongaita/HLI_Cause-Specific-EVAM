@@ -1,28 +1,29 @@
 
-### Healthy Longevity Initiative
-### 3-1 Country projection
+### 3.1 Country projection
 
 
 
-# 1 ENVIRONMENT -----------------------------------------------------------
+# 1 Loading data ----------------------------------------------------------
 
+# Applying the standard project environment
 applyEnv()
 
 # Loading data
-sarahLoad(c("country_info", "ghe_recoded", "population"), folder = "data/processed")
+sarahLoad(c("country_info", "ghe_recoded", "population"),
+          folder = "data/processed")
 
 
 
-# 2 PROJECTING ------------------------------------------------------------
+# 2 Projecting country mortality ------------------------------------------
 
 # Calculating age-cause-sex-year-specific mortality rates for analysis-eligible
 # countries and creating age groups according to Mathers & Loncar (https://doi.org/10.1371/journal.pmed.0030442)
 temp1 <- ghe_recoded %>%
-  left_join(population %>% select(iso3 = iso3.region, year, sex, age, pop),
+  left_join(population %>% select(iso3, year, sex, age, pop),
             by = c("iso3", "year", "sex", "age")) %>%
   mutate(age2 = makeMathersAgeGroup(age),
          dths_rate = dths / pop * 100000) %>%
-  select(iso3, year, sex, age2, age, everything())
+  select(iso3, year, age2, age, everything())
 
 
 # * 2.1 Determining projection method -------------------------------------
@@ -50,7 +51,8 @@ concern <- full_join(concern_A, concern_B, by = c("iso3", "sex", "age2", "ghecau
                              !is.na(concern_A) ~ concern_A,
                              !is.na(concern_B) ~ concern_B,
                              TRUE ~ NA_character_)) %>%
-  dplyr::select(-c(concern_A, concern_B))
+  dplyr::select(-c(concern_A, concern_B)) %>%
+  arrange(iso3, age2, ghecause, sex)
 
 temp2 <- full_join(temp1, concern, by = c("iso3", "sex", "age2", "ghecause", "causename")) %>%
   dplyr::select(iso3, year, sex, age2, age, ghecause, causename, dths_rate, concern)
@@ -152,12 +154,123 @@ country_projected <- full_join(temp3 %>% dplyr::select(-c(concern, age)), Output
   dplyr::select(iso3, year, age, sex, ghecause, causename, dths_rate, projection) %>%
   arrange(iso3, age, sex, ghecause, year)
 
-# Indicating frontier projection info
-country_projection_info <- full_join(model_groups %>% dplyr::select(-c(concern, age.f)) %>% unique(),
-                                     Output_concern, by = "group") %>%
-  mutate(concern = ifelse(is.na(concern), concern2, concern)) %>%
-  dplyr::select(iso3, sex, age2, ghecause, causename, concern)
-
 # __+ country_projected ---------------------------------------------------
-# __+ country_projection_info ---------------------------------------------
-sarahSave(c("country_projected", "country_projection_info"), folder = "data/processed")
+sarahSave("country_projected", folder = "data/processed")
+
+
+# 3 Creating a country projection info dataframe --------------------------
+# Documenting information about the country projections
+
+temp1 <- country_projected %>%
+  rename(base = dths_rate, projected = projection) %>%
+  mutate(age2 = makeMathersAgeGroup(age))
+
+temp2 <- full_join(model_groups %>% dplyr::select(-c(concern, age.f)) %>% unique(), Output_concern, by = "group") %>%
+  mutate(projection.concern = ifelse(is.na(concern), concern2, concern)) %>%
+  mutate(projection.method = ifelse(is.na(projection.concern), "OLS linear regression", "Average mortality rate")) %>%
+  dplyr::select(iso3, sex, age2, ghecause, causename, projection.method, projection.concern)
+
+country_projection_info_1 <- full_join(temp1, temp2, by = c("iso3", "sex", "age2", "ghecause", "causename")) %>%
+  select(year, iso3, sex, age2, age, ghecause, causename, base, projected, projection.method, projection.concern) %>%
+  arrange(iso3, ghecause, sex, age2, age, year)
+
+# __+ country_projection_info_1 -------------------------------------------
+if(!dir.exists("data/processed/country_projection_info")){
+  dir.create("data/processed/country_projection_info")
+}
+sarahSave("country_projection_info_1", folder = "data/processed/country_projection_info")
+
+
+# 4 Graphing --------------------------------------------------------------
+
+# Formatting data for graphing
+iso3s <- population %>%
+  filter(year == max(year), iso3 %notin% c("IND", "CHN")) %>%
+  group_by(iso3) %>%
+  summarize(pop = sum(pop)) %>%
+  arrange(desc(pop)) %>%
+  slice_head(n = 5) %>%
+  pull(iso3)
+
+ggdata <- country_projection_info_1 %>%
+  filter(iso3 %in% iso3s) %>%
+  mutate(age3 = makeDisplayAgeGroup(age)) %>%
+  pivot_longer(cols = c(base, projected), names_to = "type", values_to = "dths_rate") %>%
+  filter(age >= 30, !is.na(dths_rate)) %>%
+  left_join(cause_hierarchy %>% select(ghecause, prefix), by = "ghecause") %>%
+  mutate(age = makeAgeGroup(age),
+         sex = ifelse(sex == 1, "Males", "Females"),
+         type = ifelse(type == "base", "Observed", "Projected"),
+         dths_rate = ifelse(dths_rate < 0.1, 0, dths_rate)) %>%
+  mutate(zero = dths_rate == 0) %>%
+  select(iso3, year, sex, age3, age2, age, prefix, ghecause, causename, type, dths_rate, zero, projection.method) %>%
+  arrange(iso3, prefix, year, sex, age3, age2, age, type)
+
+color.info <- groupColorInfo(ggdata, "age3", "age")
+colors <- groupColor(color.info$n, color.info$names, color.and.fill = TRUE)
+shapes <- c(21, NA)
+linetypes <- c("Average mortality rate" = "dashed", "OLS linear regression" = "solid")
+
+for(j in unique(ggdata$iso3)){
+  grobs <- list()
+  for(i in unique(ggdata$causename)){
+
+    panels <- list()
+    ggdata2 <- ggdata %>% filter(iso3 == j, causename == i)
+
+    country <- country_info$country[country_info$iso3 == j]
+    id <- ids[which(unique(ggdata$causename) == i)]
+
+    ylims <- ggRange(ggdata2$dths_rate)
+    if(ylims[1] <= 0){
+      ylims <- c(0.1, ylims[2])
+    }
+
+    base <- ggplot(ggdata2) +
+      facet_grid(cols = vars(age3), rows = vars(sex)) +
+      geom_line(data = subset(ggdata2, type == "Projected" & year >= 2010),
+                aes(x = year, y = dths_rate, color = age, linetype = projection.method), size = 0.5) +
+      geom_point(data = subset(ggdata2, type == "Observed"),
+                 aes(x = year, y = dths_rate, color = age, fill = age, shape = zero)) +
+      scale_x_continuous("", breaks = seq(2000, 2040, 10),
+                         labels = c("2000", "'10", "'20", "'30", "'40")) +
+      scale_color_manual("Age", values = colors$colors) +
+      scale_fill_manual("Age", values = colors$fills) +
+      scale_linetype_manual("Projection method", values = linetypes) +
+      scale_shape_manual(values = shapes) +
+      theme(axis.title.x = element_blank(),
+            panel.grid.minor.y = element_blank(), legend.position = "bottom") +
+      guides(color = guide_legend(title.position = "top", nrow = 3),
+             fill = guide_legend(title.position = "top", nrow = 3),
+             linetype = guide_legend(title.position = "top", nrow = 3),
+             shape = "none")
+
+    panels[["standard"]] <- base +
+      labs(title = paste(id, paste0(country, ": ", i)),
+           subtitle = "Standard scale") +
+      scale_y_continuous("Frontier mortality rate (per 100K)", limits = ylims,
+                         breaks = pretty_breaks(5),
+                         labels = label_number(scale_cut = cut_long_scale()))
+
+    # Spacer
+    panels[["space"]] <- ""
+
+    # Log scale
+    panels[["log"]] <- base +
+      labs(subtitle = "Log scale") +
+      scale_y_continuous("Frontier mortality rate (per 100K)", trans = "log", limits = ylims,
+                         breaks = log.breaks, labels = log.labels)
+
+    # Combining panels
+    figure <- ggarrange(plotlist = panels, ncol = 1, align = "hv", heights = c(1, -0.1, 1),
+                        common.legend = TRUE, legend = "bottom")
+
+    grobs[[i]] <- as_grob(figure)
+
+  }
+
+  filename <- gsub("ISO", j, "3-1_country-projection_ISO.pdf")
+  saveGGplot(grobs, filename, folder = "output/figures",
+             width = 11, height = 12, multipage = TRUE)
+
+}

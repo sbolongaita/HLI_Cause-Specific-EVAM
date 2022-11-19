@@ -1,5 +1,5 @@
 
-### 4.2 Region calculations
+### 3.3 Country calculations
 
 
 
@@ -9,17 +9,16 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("country_info", "frontier_lagged", "population", "region"), folder = "data/processed")
-
+sarahLoad(c("country_info", "country_scaled", "frontier_lagged", "population"), folder = "data/processed")
 
 
 # 2 Mortality differential ------------------------------------------------
 
-# Prepping region data
-region %<>%
+# Prepping country data
+country_scaled %<>%
   mutate(sex_match = ifelse(causename %in% sex.specific, sex, NA)) %>%
-  dplyr::select(region, year, age, sex_match, sex, ghecause, causename, dths_rate) %>%
-  arrange(region, year, age, ghecause, sex)
+  dplyr::select(iso3, year, age, sex_match, sex, ghecause, causename, dths_rate) %>%
+  arrange(iso3, year, age, ghecause, sex)
 
 # Prepping frontier data
 frontier_lagged %<>%
@@ -27,34 +26,12 @@ frontier_lagged %<>%
   arrange(year, age, ghecause, sex_match)
 
 # Combining country and frontier data
-data <- inner_join(region, frontier_lagged, by = c("year", "age", "sex_match", "ghecause", "causename")) %>%
+data <- inner_join(country_scaled, frontier_lagged, by = c("year", "age", "sex_match", "ghecause", "causename")) %>%
   mutate_at(vars(dths_rate, frontier), ~ . /100000) %>%
-  dplyr::select(-sex_match)
+  dplyr::select(-sex_match) %>%
+  arrange(iso3, ghecause, age, sex, year)
 
 containsNA(data)
-
-region.lt.frontier <- data %>%
-  mutate_at(vars(dths_rate, frontier), ~ round(.  * 100000)) %>%
-  mutate(delta = round(dths_rate - frontier)) %>%
-  filter(delta < 0)
-
-region.levels <- region.lt.frontier %>%
-  group_by(region) %>%
-  summarize(max.delta = max(abs(delta))) %>%
-  arrange(desc(max.delta)) %>%
-  pull(region)
-
-ghecause.levels <- region.lt.frontier %>%
-  group_by(region, ghecause) %>%
-  summarize(max.delta = max(abs(delta))) %>%
-  arrange(desc(max.delta)) %>%
-  pull(ghecause) %>% unique()
-
-region.lt.frontier %<>%
-  mutate(region = factor(region, levels = region.levels),
-         ghecause = factor(ghecause, levels = ghecause.levels)) %>%
-  arrange(region, ghecause, sex, age, year)
-
 
 
 # 3 CALCULATING VARIABLES -------------------------------------------------
@@ -68,68 +45,16 @@ delta <- data %>%
 containsNA(delta)
 
 # * alpha -----------------------------------------------------------------
-# Region population
+# Population weight
 population %<>%
-  group_by(region, year, age, sex) %>%
-  summarize(pop = sum(pop), .groups = "drop") %>%
-  group_by(region, year) %>%
+  group_by(iso3, year) %>%
   mutate(alpha = pop / sum(pop)) %>%
-  select(region, year, age, sex, pop, alpha) %>%
-  arrange(region, year, sex, age)
+  select(iso3, year, age, sex, pop, alpha)
 
-alpha <- delta %>% left_join(population, by = c("region", "year", "age", "sex"))
+alpha <- delta %>% left_join(population, by = c("iso3", "year", "age", "sex"))
 
 containsNA(alpha)
 
-# * e,  e_rho,  e40_rho ---------------------------------------------------
-rho = 0.03
-
-# c.e = Country life expectancy; c.e_rho = Discounted country life expectancy
-temp1 <- country_info %>% filter(analysis_eligible) %>% select(iso3, region) %>%
-  left_join(read.csv("data/input/chang_country.csv", as.is = TRUE), by = "iso3") %>%
-  group_by(region, year, sex, age) %>%
-  mutate(wt = pop / sum(pop)) %>%
-  mutate(ex2 = ex * wt) %>%
-  summarize(ex = sum(ex2), .groups = "drop")
-temp2 <- temp1 %>%
-  mutate(c.e_rho = (1- (1+rho)^(-ex-1)) * ((1+rho)/rho)) %>%
-  dplyr::select(region, year, age, sex, c.e = ex, c.e_rho)
-c.e40_rho <- temp2 %>%
-  filter(age == 40) %>%
-  dplyr::select(region, year, sex, c.e40_rho = c.e_rho)
-e <- alpha %>%
-  left_join(temp2, by = c("region", "year", "age", "sex")) %>%
-  left_join(c.e40_rho, by = c("region", "year", "sex"))
-
-containsNA(e)
-
-# f.e = Frontier life expectancy; f.e_rho = Discounted frontier life expectancy
-temp1 <- read.csv("data/input/chang_frontier.csv", as.is = TRUE) %>%
-  mutate(year = floor(year), f.e_rho = (1- (1+rho)^(-ex-1)) * ((1+rho)/rho)) %>%
-  dplyr::select(year, age, f.e = ex, f.e_rho)
-f.e40_rho <- temp1 %>%
-  filter(age == 40) %>%
-  dplyr::select(year, f.e40_rho = f.e_rho)
-e2 <- e %>%
-  left_join(temp1, by = c("year", "age")) %>%
-  left_join(f.e40_rho, by = c("year"))
-
-containsNA(e2)
-
-# * p1 --------------------------------------------------------------------
-lambda = c(1, 5, 10)
-for(i in seq_along(lambda)){
-  out <- e %>%
-    mutate(lambda = lambda[i],
-           p1 = ((1-exp(-1*lambda[i]*delta)) / (lambda[i])) * (c.e_rho / c.e40_rho))
-  if(i == 1){
-    p1 <- out
-  }else{
-    p1 <- bind_rows(p1, out)
-  }
-}
-
-containsNA(p1)
 
 # * p2 --------------------------------------------------------------------
 mece <- c("Level 1" = "mece_lvl1", "Level 2" = "mece_lvl2", "Level 3" = "mece_lvl3")
@@ -139,9 +64,10 @@ for(i in seq_along(mece)){
     left_join(cause_hierarchy %>% select(ghecause, mece = !!as.name(mece[i])),
               by = "ghecause") %>%
     filter(mece) %>%
-    group_by(region, year, age, sex, lambda) %>%
+    group_by(iso3, year, age, sex, lambda) %>%
     dplyr::mutate(mece = level,
-                  p2 = delta / sum(delta))
+                  p2 = delta / sum(delta)) %>%
+    ungroup()
   if(i == 1){
     p2 <- out
   }else{
@@ -149,23 +75,30 @@ for(i in seq_along(mece)){
   }
 }
 
-p2 %<>% arrange(region, year, age, ghecause, sex)
+containsNA(p2)
+
+p2 %<>%
+  mutate(p2 = ifelse(is.nan(p2), 0, p2)) %>%
+  arrange(iso3, year, age, ghecause, sex)
 
 containsNA(p2)
 
+
+
+# Multiply by country alpha for regional level and diego's b
 
 # ! Not age-specific from this point forward ------------------------------
 # * R ---------------------------------------------------------------------
 R <- p2 %>%
   mutate(r = alpha * p1 * p2) %>%
-  group_by(region, year, sex, ghecause, causename, lambda, mece) %>%
+  group_by(iso3, year, sex, ghecause, causename, lambda, mece) %>%
   dplyr::summarize(R = sum(r), .groups = "drop")
 
 containsNA(R)
 
 # * R_bar -----------------------------------------------------------------
 R_bar <- R %>%
-  group_by(region, year, sex, lambda, mece) %>%
+  group_by(iso3, year, sex, lambda, mece) %>%
   dplyr::mutate(R_bar = R / sum(R)) %>%
   ungroup()
 
@@ -173,7 +106,7 @@ containsNA(R_bar)
 
 # Checking R_bar sums to 1
 check <- R_bar %>%
-  group_by(region, year, sex, lambda, mece) %>%
+  group_by(iso3, year, sex, lambda, mece) %>%
   dplyr::summarize(R_bar = sum(R_bar), .groups = "drop") %>%
   filter(round(R_bar, 0.01) > 1)
 if(nrow(check) > 0){
@@ -181,73 +114,10 @@ if(nrow(check) > 0){
 }
 
 
-# * Y ---------------------------------------------------------------------
-# GNI per capita, 2019 (intl PPP 2017)
-Y <- country_info %>% filter(analysis_eligible) %>% select(iso3, region) %>%
-  left_join(read.csv("data/input/gni.csv", as.is = TRUE), by = "iso3") %>%
-  filter(currency == "Current international dollars",
-         year == 2019) %>%
-  group_by(region) %>%
-  summarize(gni.pc = mean(gni.pc, na.rm = TRUE), .groups = "drop") %>%
-  dplyr::select(region, Y = gni.pc)
-
-
-# * VSL -------------------------------------------------------------------
-# Value of a statistical life
-Y_us <- read.csv("data/input/gni.csv", as.is = TRUE) %>%
-  filter(iso3 == "USA", currency == "Current international dollars", year == 2019) %>%
-  pull(gni.pc)
-VSL_us <- Y_us * 160
-temp3 <- expand_grid(Y, epsilon = seq(0.8, 1.2, 0.1)) %>%
-  mutate(VSL = VSL_us * (Y/Y_us)^epsilon)
-VSL <- R_bar %>%
-  left_join(temp3, by = "region")
-
-containsNA(VSL)
-
-# * VSLY ------------------------------------------------------------------
-# Value of a statistical life year
-VSLY <- VSL %>%
-  left_join(c.e40_rho, by = c("region", "year", "sex")) %>%
-  mutate(VSLY = VSL / c.e40_rho)
-
-containsNA(VSLY)
-
-# * V, V_bar --------------------------------------------------------------
-V <- VSLY %>%
-  mutate(V = R * VSLY,
-         V_bar = R_bar * VSLY)
-
-containsNA(V)
-
-# * GDP multiple ----------------------------------------------------------
-mult <- V %>%
-  mutate(mult = V_bar / Y)
-
-containsNA(mult)
-
-
-# __ + region_calculations ------------------------------------------------
-region_calculations <- mult
-sarahSave("region_calculations", folder = "data/processed")
-sarahSave("region_calculations", folder = "output/data")
-
-# * Chang multiple --------------------------------------------------------
-
-chang <- read.csv("data/input/chang_valuation-by-region.csv") %>%
-  mutate(region = gsub("\n", " ", wb.region)) %>%
-  select(region, year, b_log_1yr)
-
-mult2 <- mult %>% left_join(chang, by = c("region", "year")) %>%
-  filter(!is.na(b_log_1yr)) %>%
-  mutate(pct = R_bar * b_log_1yr)
-
-containsNA(mult2)
-
-# __ + region_calculations_2 ----------------------------------------------
-region_calculations_2 <- mult2
-sarahSave("region_calculations_2", folder = "data/processed")
-sarahSave("region_calculations_2", folder = "output/data")
+# Saving
+country_calculations <- mult
+sarahSave("country_calculations", folder = "data/processed")
+sarahSave("country_calculations", folder = "output/data")
 
 
 

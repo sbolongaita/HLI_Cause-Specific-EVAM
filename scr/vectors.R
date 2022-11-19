@@ -11,8 +11,12 @@ graphing.groups <- list("Level" = list("Level 0" = cause_hierarchy$ghecause[caus
                                       "Noncommunicable diseases" = cause_hierarchy$ghecause[cause_hierarchy$main_causename == "Noncommunicable diseases"],
                                       "Injuries" = cause_hierarchy$ghecause[cause_hierarchy$main_causename == "Injuries"]))
 
+# Sex-specific causenames
+sex.specific <- c("Breast cancer", "Cervix uteri cancer")
+
 # Causename levels
 causename.levels <- as.character(cause_hierarchy$causename)
+causename.levels2 <- ifelse(causename.levels %in% sex.specific, paste(causename.levels, "(females)"), causename.levels)
 
 # Sex-specific causenames
 sex.specific <- c("Breast cancer", "Cervix uteri cancer")

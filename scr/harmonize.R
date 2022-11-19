@@ -44,7 +44,7 @@ harmonize <- function(Level, lower.level.df, higher.level.df){
     scale_y_continuous(paste("Mortality rates of summed level", Level, "causes of death"))
 
   Check <- check %>%
-    filter(round(lower_summed) != round(higher))
+    filter(signif(lower_summed, 1) != signif(higher, 1))
   if(nrow(Check) > 0){
     warning("Error in harmonization")
     Check

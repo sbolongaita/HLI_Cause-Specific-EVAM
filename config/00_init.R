@@ -3,8 +3,13 @@
 ### 00 Initialization
 
 
+# 1 CLEARING ENVIRONMENT --------------------------------------------------
 
-# 1 PACKAGES --------------------------------------------------------------
+rm(list = ls())
+
+
+
+# 2 PACKAGES --------------------------------------------------------------
 # Loading project packages
 
 # Installing and loading SarahB package
@@ -14,7 +19,7 @@ if(!require("SarahB")) devtools::install_github("sbolongaita/SarahB"); library(S
 # Defining other packages for installation and loading
 packages <- c(
   # A, B, C, D
-  "colorspace", "countrycode", "DescTools", "devtools",
+  "colorspace", "countrycode", "cowplot", "DescTools", "devtools",
   # E, F, G, H
   "extrafont", "foreign", "ggplot2", "ggrepel", "ggsci", "ggthemes", "ggpubr", "grid",
   "gridExtra", "gtools", "haven", "Hmisc",
@@ -22,9 +27,9 @@ packages <- c(
   # M, N, O, P
   "magrittr", "openxlsx", "plyr", "purrr",
   # Q, R, S, T
-  "reader", "remotes", "renv", "scales", "shades", "stringr", "sysfonts", "tidyr",
+  "reader", "remotes", "renv", "rlang", "scales", "shades", "stringr", "sysfonts", "tidyr",
   # Last load packages
-  "dplyr"
+  "dplyr", "base"
 )
 
 # Loading packages
@@ -32,10 +37,10 @@ SarahB::loadPackages(packages)
 
 
 
-# 2 UTILITY SCRIPTS -------------------------------------------------------
+# 3 UTILITY SCRIPTS -------------------------------------------------------
 # Running utility scripts
 
-scripts <- c(list.files("scr", full.names = TRUE))
+scripts <- list.files("scr", full.names = TRUE)
 scripts <- scripts[!grepl("raw", scripts)]
 for(script in scripts){
   source(script)
@@ -45,11 +50,11 @@ for(script in scripts){
 
 # 3 ENVIRONMENT -----------------------------------------------------------
 
-# Setting the `renv` environment
+# Initializing/setting/restoring the `renv` environment
 # renv::init()
 renv::snapshot()
 
 # Saving the default global environment
-environment <- ls()
+environment <- c(ls(), "environment")
 save(environment, file = "config/environment.Rda")
 save.image(file = "config/environment.RData")
