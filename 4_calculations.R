@@ -9,11 +9,9 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("country_info", "country_scaled", "frontier_lagged", "population"), folder = "data/processed")
-
-cardoso <- read.csv("data/input/chang_envelopes-baseline.csv", as.is = TRUE) %>%
-  mutate(region = gsub("\n", " ", wb.region)) %>%
-  select(region, iso3 = country, year, age, sex, everything())
+sarahLoad(c("chang_envelope", "country_info", "country_scaled", "frontier_lagged", "population"),
+          folder = "data/processed")
+envelope <- read.csv("data/input/chang_envelope.csv", as.is = TRUE)
 
 
 # 2 Mortality differential ------------------------------------------------
@@ -115,9 +113,9 @@ check <- alpha %>%
 check %>% filter(round(alpha, 4) != 1)
 # - Checking NA, NAN, infinite
 containsNA(alpha)
-# - Checking consistency w Cardoso
+# - Checking consistency w envelope
 check <- alpha %>%
-  left_join(cardoso %>% select("iso3", "year", "age", "sex", "pop.sex.weight"),
+  left_join(envelope %>% select("iso3", "year", "age", "sex", "pop.sex.weight"),
             by = c("iso3", "year", "age", "sex"))
 check %>% filter(round(alpha, 4) != round(pop.sex.weight, 4))
 
@@ -126,7 +124,7 @@ alpha <- p %>% left_join(alpha, by = c("iso3", "year", "age", "sex"))
 
 # * v.c --------------------------------------------------------------------
 
-v.country <- inner_join(alpha, cardoso %>% select("iso3", "year", "age", "sex", "b_log_1yr"),
+v.country <- inner_join(alpha, envelope %>% select("iso3", "year", "age", "sex", "b_log_1yr"),
                         by = c("iso3", "year", "age", "sex")) %>%
   mutate(v.c = alpha * p * b_log_1yr) %>%
   group_by(iso3, year, sex, ghecause, causename, mece.lvl) %>%

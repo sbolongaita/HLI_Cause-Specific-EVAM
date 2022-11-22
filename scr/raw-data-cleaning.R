@@ -73,3 +73,11 @@ temp1 <- read.csv("data/raw/Chang_frontier-life-tables.csv", as.is = TRUE) %>%
 chang_frontier <- temp1 %>%
   arrange(year, age)
 write.csv(chang_frontier, file = "data/input/chang_frontier.csv", row.names = FALSE)
+
+# Chang envelope
+temp1 <- read.csv("data/raw/chang_envelopes-baseline.csv", as.is = TRUE) %>%
+  mutate(region = gsub("\n", " ", wb.region)) %>%
+  select(region, iso3 = country, year, age, sex, everything())
+chang_envelope <- temp1 %>%
+  arrange(iso3, year, age, sex)
+write.csv(chang_envelope, file = "data/input/chang_envelope.csv", row.names = FALSE)
