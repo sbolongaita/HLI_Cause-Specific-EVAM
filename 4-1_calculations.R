@@ -1,5 +1,5 @@
 
-### 3.3 Country calculations
+### 4.1 Country calculations
 
 
 
@@ -135,6 +135,8 @@ country_calculations <- v.country
 
 # __ + country_calculations -----------------------------------------------
 sarahSave("country_calculations", folder = "output/data")
+write.csv(country_calculations, file = "output/data/country_calculations.csv",
+          na = "", row.names = FALSE)
 
 
 # * w ---------------------------------------------------------------------
@@ -197,8 +199,11 @@ containsNA(R_bar)
 
 region_calculations <- R_bar
 
-sarahSave("region_calculations", folder = "output/data")
 
+# __ + region_calculations ------------------------------------------------
+sarahSave("region_calculations", folder = "output/data")
+write.csv(region_calculations, file = "output/data/region_calculations.csv",
+          na = "", row.names = FALSE)
 
 # 4 Graphing --------------------------------------------------------------
 
