@@ -1,6 +1,6 @@
 
 ### Healthy Longevity Initiative
-### 00 Initialization
+
 
 
 # 1 CLEARING ENVIRONMENT --------------------------------------------------
