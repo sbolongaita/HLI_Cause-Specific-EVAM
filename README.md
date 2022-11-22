@@ -172,8 +172,6 @@ This script takes the harmonized, projected, and scaled frontier mortality rates
 -   `data/processed/frontier_info/frontier_info.Rda`
 -   `data/processed/frontier_info.Rda`
 
-jalksfjasidfjaoighjatofiaoifhawpeit8up8r9upwoaehfcasdknvalkjdvhflagkfhwOEFUPAOIVJHDJL;IJA;DLKFFASF
-
 ## 3. Country and Region Analyses
 
 ### 3-1. Country projection
@@ -212,6 +210,8 @@ This script takes the projected country mortality rates and scales them with the
 -   `data/processed/country_scaled.Rda`
 -   `data/processed/country_projection_info_2`
 
+## 4. Calculations
+
 ### 4-1. Calculations
 
 **Script:** `4-calculations.Rda`
@@ -230,21 +230,3 @@ This script takes the lagged frontier and the scaled country projections and cal
 **Output:**
 -   `data/processed/country_calculations.Rda`
 -   `data/processed/region_calculations.Rda`
-
-## 4. Calculations
-
-### 4-1. Country calculations
-
-**Script:** `4-1_country-calculations.R`
-
-**Objective:**
-
-**Input:**
--   `data/processed/country_scaled.Rda`
--   `data/processed/frontier_scaled.Rda`
--   `data/processed/population.Rda`
--   `data/input/gni.csv`
-
-**Output:**
--   `data/processed/country_calculations.Rda`
--   `output/data/country_calculations.Rda`
