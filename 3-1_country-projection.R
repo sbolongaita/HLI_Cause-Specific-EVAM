@@ -46,8 +46,10 @@ concern_B <- temp1 %>%
 
 # Either concern (A) mortality rates contains a 0-value or (B) average number deaths
 # less than 100
-concern <- full_join(concern_A, concern_B, by = c("iso3", "sex", "age2", "ghecause", "causename")) %>%
-  mutate(concern = case_when(!is.na(concern_A) & !is.na(concern_B) ~ paste0(concern_A, "; ", tolower(concern_B)),
+concern <- full_join(concern_A, concern_B,
+                     by = c("iso3", "sex", "age2", "ghecause", "causename")) %>%
+  mutate(concern = case_when(!is.na(concern_A) & !is.na(concern_B) ~
+                               paste0(concern_A, "; ", tolower(concern_B)),
                              !is.na(concern_A) ~ concern_A,
                              !is.na(concern_B) ~ concern_B,
                              TRUE ~ NA_character_)) %>%
@@ -99,14 +101,14 @@ for(i in unique(model_groups$group)){
     output <- model_data %>%
       group_by(group, age.f) %>%
       dplyr::summarize(projection = mean(dths_rate), .groups = "drop") %>%
-      expand_grid(year = 2010:2045) %>%
+      expand_grid(year = 2010:2040) %>%
       dplyr::select(group, age.f, year, projection)
     output_concern$concern2 <- NA
 
   }else{
 
       output <- expand_grid(model_data %>% dplyr::select(group, age.f) %>% unique(),
-                            year = 2010:2045)
+                            year = 2010:2040)
       if(all(model_data$age.f == 85)){
         model <- lm(log(dths_rate) ~ year, data = model_data)
       }else{
@@ -121,7 +123,7 @@ for(i in unique(model_groups$group)){
         output <- model_data %>%
           group_by(group, age.f) %>%
           dplyr::summarize(projection = mean(dths_rate), .groups = "drop") %>%
-          expand_grid(year = 2010:2045) %>%
+          expand_grid(year = 2010:2040) %>%
           dplyr::select(group, age.f, year, projection)
         output_concern$concern2 <- "OLS linear regression indicated positive trend"
       }

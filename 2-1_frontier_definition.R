@@ -9,7 +9,8 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("cause_hierarchy", "country_info", "ghe_recoded", "population"), folder = "data/processed")
+sarahLoad(c("cause_hierarchy", "country_info", "ghe_recoded", "population"),
+          folder = "data/processed")
 
 
 

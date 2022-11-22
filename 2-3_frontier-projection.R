@@ -9,8 +9,8 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("country_info", "frontier_base", "frontier_harmonized", "frontier_info/frontier_info_2", "ghe_recoded", "population"),
-          folder = "data/processed")
+sarahLoad(c("frontier_harmonized", "frontier_info/frontier_info_2",
+            "ghe_recoded", "population"), folder = "data/processed")
 
 
 

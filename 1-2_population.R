@@ -21,11 +21,11 @@ population <- read.csv("data/input/population.csv", as.is = TRUE)
 
 # Filtering population data to countries and years of interest and reformatting
 # to long data
-temp1 <- left_join(country_info %>% select(iso3, region), population,
-                   by = "iso3")
-
-population <- temp1 %>%
-  dplyr::select(iso3, region, year, age, sex, pop) %>%
+population <- country_info %>%
+  filter(analysis_eligible) %>%
+  select(region, iso3) %>%
+  left_join(population, by = "iso3") %>%
+  dplyr::select(region, iso3, year, age, sex, pop) %>%
   arrange(iso3, year, sex, age)
 
 

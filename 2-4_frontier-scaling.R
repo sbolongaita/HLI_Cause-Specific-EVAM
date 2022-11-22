@@ -9,7 +9,8 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("cause_hierarchy", "frontier_projected", "frontier_info/frontier_info_3"), folder = "data/processed")
+sarahLoad(c("cause_hierarchy", "frontier_projected", "frontier_info/frontier_info_3"),
+          folder = "data/processed")
 envelope <- read.csv("data/input/chang_frontier.csv", as.is = TRUE) %>%
   mutate(reference = mxn * 100000) %>%
   select(year, age, reference)

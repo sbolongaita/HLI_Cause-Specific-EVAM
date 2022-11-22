@@ -133,6 +133,11 @@ v.country <- inner_join(alpha, cardoso %>% select("iso3", "year", "age", "sex", 
   summarize(v.c = sum(v.c), .groups = "drop") %>%
   arrange(iso3, year, sex, mece.lvl, ghecause)
 
+country_calculations <- v.country
+
+# __ + country_calculations -----------------------------------------------
+sarahSave("country_calculations", folder = "output/data")
+
 
 # * w ---------------------------------------------------------------------
 # Country weights
@@ -192,6 +197,10 @@ check %>% filter(round(R_bar, 4) != 1)
 # - Checking NA, NAN, infinite
 containsNA(R_bar)
 
+region_calculations <- R_bar
+
+sarahSave("region_calculations", folder = "output/data")
+
 
 # 4 Graphing --------------------------------------------------------------
 
@@ -225,21 +234,24 @@ for(i in unique(ggdata$mece.lvl)){
       title <- ""
     }
 
-    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(v.r), 0.1)
+    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(v.r), 0.05)
 
-    colors.grey <- groupColorInfo(ggdata2 %>%
-                                    filter(main_causename != "Noncommunicable diseases"),
-                                  "main_causename", "causename")
-    colors.grey <- groupColor(n = sum(colors.grey$n), names = rev(colors.grey$names),
-                              palettes = "grey", color.and.fill = TRUE)
+    grey.info <- groupColorInfo(ggdata2 %>%
+                                  filter(main_causename != "Noncommunicable diseases"),
+                                "main_causename", "causename")
+
+    greys <- groupColor(n = 4, palettes = "grey", color.and.fill = TRUE, show = TRUE)
+    greys$colors <- rev(greys$colors); greys$fills <- rev(greys$fills)
+    greys$colors <- setNames(greys$colors[1:sum(grey.info$n)], grey.info$names)
+    greys$fills <- setNames(greys$colors[1:sum(grey.info$n)], grey.info$names)
 
     colors <- ggdata2 %>% filter(main_causename == "Noncommunicable diseases") %>%
       arrange(main_causename, causename) %>%
       pull(causename) %>% unique()
     colors <- colorFunct(n = length(colors), names = colors, color.and.fill = TRUE)
 
-    colors[["colors"]] <- c(colors[["colors"]], colors.grey[["colors"]])
-    colors[["fills"]] <- c(colors[["fills"]], colors.grey[["fills"]])
+    colors[["colors"]] <- c(colors[["colors"]], greys[["colors"]])
+    colors[["fills"]] <- c(colors[["fills"]], greys[["fills"]])
 
     breaks <- wrapper(causename.levels, wrap)[wrapper(causename.levels, wrap) %in% unique(ggdata2$causename)]
 
@@ -291,21 +303,24 @@ for(i in unique(ggdata$mece.lvl)){
       title <- ""
     }
 
-    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(R_bar), 0.1)
+    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(R_bar), 0.05)
 
-    colors.grey <- groupColorInfo(ggdata2 %>%
-                                    filter(main_causename != "Noncommunicable diseases"),
-                                  "main_causename", "causename")
-    colors.grey <- groupColor(n = sum(colors.grey$n), names = rev(colors.grey$names),
-                              palettes = "grey", color.and.fill = TRUE)
+    grey.info <- groupColorInfo(ggdata2 %>%
+                                  filter(main_causename != "Noncommunicable diseases"),
+                                "main_causename", "causename")
+
+    greys <- groupColor(n = 4, palettes = "grey", color.and.fill = TRUE, show = TRUE)
+    greys$colors <- rev(greys$colors); greys$fills <- rev(greys$fills)
+    greys$colors <- setNames(greys$colors[1:sum(grey.info$n)], grey.info$names)
+    greys$fills <- setNames(greys$colors[1:sum(grey.info$n)], grey.info$names)
 
     colors <- ggdata2 %>% filter(main_causename == "Noncommunicable diseases") %>%
       arrange(main_causename, causename) %>%
       pull(causename) %>% unique()
     colors <- colorFunct(n = length(colors), names = colors, color.and.fill = TRUE)
 
-    colors[["colors"]] <- c(colors[["colors"]], colors.grey[["colors"]])
-    colors[["fills"]] <- c(colors[["fills"]], colors.grey[["fills"]])
+    colors[["colors"]] <- c(colors[["colors"]], greys[["colors"]])
+    colors[["fills"]] <- c(colors[["fills"]], greys[["fills"]])
 
     breaks <- wrapper(causename.levels, wrap)[wrapper(causename.levels, wrap) %in% unique(ggdata2$causename)]
 

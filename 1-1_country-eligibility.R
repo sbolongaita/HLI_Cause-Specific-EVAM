@@ -3,8 +3,9 @@
 
 # This script defines and applies the eligibility criteria for country
 # inclusion in the analysis. Countries were eligible for inclusion if
-# they had populations of at least five million in 2019 Of those countries
-# with populations of at least five million, a smaller subset were eligible
+# they had populations of at least five million in 2019 and available income
+# (i.e., GNI per capita) data for 2019. Of those countries with populations of at least
+# five million and available income data, a smaller subset were eligible
 # for the frontier analysis: those with high-quality vital registration
 # data and which were not excluded from the GHE 2019 analysis.
 
@@ -16,7 +17,7 @@
 applyEnv()
 
 # Loading data
-names <- c("ghe", "population", "quality", "region")
+names <- c("ghe", "gni", "population", "quality", "region")
 for(name in names){
   files <- list.files("data/input", pattern = name, full.names = TRUE)
   if(length(files) > 1){
@@ -59,16 +60,22 @@ nonghe_iso3 <- countryname(c("Belarus", "Belize", "Jamaica", "Kazakhstan",
                              "Kyrgyzstan", "Kuwait", "Trinidad and Tobago"),
                            destination = "iso3c")
 
+# Countries that have GNI per capita data
+gni_iso3 <- gni %>%
+  filter(year == 2019, !is.na(gni.pc)) %>%
+  arrange(iso3) %>% pull(iso3) %>% unique()
+
 # Adding this information to the dataframe
 temp2 <- temp1 %>%
   mutate(pop = ifelse(iso3 %notin% pop_iso3, "2019 population less than 5 million", NA),
          qual = ifelse(iso3 %notin% hq_iso3, "Low quality vital registration data", NA),
-         ghe = ifelse(iso3 %in% nonghe_iso3, "Not included in GHE 2019", NA))
+         ghe = ifelse(iso3 %in% nonghe_iso3, "Not included in GHE 2019", NA),
+         gni = ifelse(iso3 %notin% gni_iso3, "2019 income data unavailable", NA))
 
 # Documenting eligibility for analysis and the frontier
 temp3 <- temp2 %>%
-  mutate(analysis_eligible = is.na(pop)) %>%
-  unite(col = "frontier_exclusion", c(pop, qual, ghe),
+  mutate(analysis_eligible = is.na(pop) & is.na(gni)) %>%
+  unite(col = "frontier_exclusion", c(pop, qual, ghe, gni),
         sep = "; ", na.rm = TRUE, remove = TRUE) %>%
   mutate(frontier_exclusion = capitalize(gsub("ghe", "GHE", tolower(frontier_exclusion)))) %>%
   mutate(frontier_exclusion = ifelse(frontier_exclusion == "", NA, frontier_exclusion)) %>%
