@@ -1,7 +1,10 @@
 
 ### 2.2 Frontier Harmonization
 
-
+# This script harmonizes (or scales) the frontier using a level-wise approach,
+# such that mortality rates of lower level causes of death sum to mortality
+# rates of higher level causes of death. This script relies a function
+# (`harmonize`) created in `scr/harmonize.R`.
 
 # 1 Loading data ----------------------------------------------------------
 
@@ -92,6 +95,8 @@ sarahSave("frontier_info_2", folder = "data/processed/frontier_info")
 
 
 # 4 Graphing --------------------------------------------------------------
+
+exit()
 
 ggdata <- frontier_info_2 %>%
   pivot_longer(cols = c("base", "harmonized"), names_to = "stage", values_to = "frontier") %>%

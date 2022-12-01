@@ -1,7 +1,9 @@
 
 ### 3.2 Country scaling
 
-
+# This script takes the projected country mortality rates and scales them
+# with the demographic longevity frontiers of the accompanying HLI paper,
+# Chang et al. (2022), based on UN Population data.
 
 # 1 Loading data ----------------------------------------------------------
 
@@ -104,6 +106,7 @@ country_projection_info_2 <- country_projection_info_1 %>%
 sarahSave("country_projection_info_2", folder = "data/processed/country_projection_info")
 
 
+exit()
 # 3 Graphing --------------------------------------------------------------
 
 iso3s <- population %>%

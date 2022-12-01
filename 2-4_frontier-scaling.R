@@ -1,6 +1,9 @@
 
 ### 2.4 Frontier scaling
 
+# This script takes the harmonized and projected frontier mortality rates
+# and scales them with the demographic longevity frontiers of the accompanying
+# HLI paper, Chang et al. (2022), based on UN Population data.
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -112,6 +115,8 @@ sarahSave("frontier_info_4", folder = "data/processed/frontier_info")
 
 
 # 3 GRAPHING --------------------------------------------------------------
+
+exit()
 
 # Formatting data for graphing
 ggdata <- left_join(frontier_projected %>%

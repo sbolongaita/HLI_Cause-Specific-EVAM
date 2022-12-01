@@ -1,6 +1,11 @@
 
 ### 2.3 Frontier projection
 
+# This script takes the harmonized frontier mortality rates for 2010-2019
+# and projects them into the future using ordinary least squares (OLS) linear
+# regression, unless there are stochastic concerns or a positive trend line
+# from the regression, in which case the average mortality rate from 2010-2019
+# is used.
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -9,7 +14,7 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("frontier_harmonized", "frontier_info/frontier_info_2",
+sarahLoad(c("frontier_base", "frontier_harmonized", "frontier_info/frontier_info_2",
             "ghe_recoded", "population"), folder = "data/processed")
 
 
@@ -177,6 +182,8 @@ sarahSave("frontier_info_3", folder = "data/processed/frontier_info")
 
 
 # 3 GRAPHING --------------------------------------------------------------
+
+exit()
 
 # Formatting data for graphing
 ggdata <- left_join(frontier_projected %>%

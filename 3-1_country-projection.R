@@ -1,6 +1,11 @@
 
 ### 3.1 Country projection
 
+# This script takes country mortality rates for 2000-2019 and projects them
+# into the future using ordinary least squares linear regression, unless there
+# are stochastic concerns or a positive trend line from the regression, in which
+# case an average is used. This method is the same as the method used for the
+# frontier projections.
 
 
 # 1 Loading data ----------------------------------------------------------

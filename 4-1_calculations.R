@@ -1,6 +1,9 @@
 
 ### 4.1 Country calculations
 
+# This script takes the lagged frontier and the scaled country projections
+# and calculates the value of eliminating avoidable mortality by cause and
+# country/region.
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -207,6 +210,8 @@ write.csv(region_calculations, file = "output/data/region_calculations.csv",
 
 # 4 Graphing --------------------------------------------------------------
 
+exit()
+
 wrap <- 45
 
 # _ A ---------------------------------------------------------------------
@@ -237,7 +242,7 @@ for(i in unique(ggdata$mece.lvl)){
       title <- ""
     }
 
-    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(v.r), 0.05)
+    ylims <- ggRange(ggdata %>% filter(mece.lvl == i) %>% pull(v.r), 0.1)
 
     grey.info <- groupColorInfo(ggdata2 %>%
                                   filter(main_causename != "Noncommunicable diseases"),
@@ -263,7 +268,7 @@ for(i in unique(ggdata$mece.lvl)){
       geom_col(aes(x = as.factor(year), y = v.r, fill = causename, color = causename)) +
       labs(title = title, subtitle = j) +
       scale_x_discrete("") +
-      scale_y_continuous("Proportion of GNI per capita", limits = ylims,
+      scale_y_continuous("Proportion of GNI per capita", limits = c(0, 0.5),
                          expand = expansion(mult = c(0, 0.05))) +
       scale_color_manual(paste("Level", i,"causes"), values = colors$colors,
                          breaks = breaks) +

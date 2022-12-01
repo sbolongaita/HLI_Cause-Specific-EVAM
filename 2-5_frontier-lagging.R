@@ -1,6 +1,9 @@
 
 ### 2.5 Frontier lagging
 
+# This script takes the harmonized, projected, and scaled frontier mortality
+# rates and lags them by 5 years (such that the frontier mortality rate for
+# 2020 becomes the frontier mortality rate for 2015).
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -38,6 +41,8 @@ sarahSave("frontier_info", folder = "data/processed")
 
 
 # 3 GRAPHING --------------------------------------------------------------
+
+exit()
 
 # * 3.1 A Lagging ---------------------------------------------------------
 

@@ -4,10 +4,10 @@
 # This script defines and applies the eligibility criteria for country
 # inclusion in the analysis. Countries were eligible for inclusion if
 # they had populations of at least five million in 2019 and available income
-# (i.e., GNI per capita) data for 2019. Of those countries with populations of at least
-# five million and available income data, a smaller subset were eligible
-# for the frontier analysis: those with high-quality vital registration
-# data and which were not excluded from the GHE 2019 analysis.
+# (i.e., GNI per capita) data for 2019. Of those countries with populations
+# of at least five million and available income data, a smaller subset were
+# eligible for the frontier analysis: those with high-quality vital
+# registration data and which were not excluded from the GHE 2019 analysis.
 
 
 

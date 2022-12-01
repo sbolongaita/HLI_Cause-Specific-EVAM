@@ -1,8 +1,4 @@
 
-### Healthy Longevity Initiative
-
-
-
 # 1 CLEARING ENVIRONMENT --------------------------------------------------
 
 rm(list = ls())
@@ -40,8 +36,7 @@ SarahB::loadPackages(packages)
 # 3 UTILITY SCRIPTS -------------------------------------------------------
 # Running utility scripts
 
-scripts <- list.files("scr", full.names = TRUE)
-scripts <- scripts[!grepl("raw", scripts)]
+scripts <- list.files("scr", full.names = TRUE, pattern = ".R")
 for(script in scripts){
   source(script)
 }

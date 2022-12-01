@@ -1,6 +1,13 @@
 
 ### 2.1 Frontier Definition
 
+# This script takes the recoded GHE data for frontier-eligible countries,
+# calculates age-cause-specific mortality rates, and the extracts the frontier
+# using two definitions: the minimum and the 10th percentile. It selects the
+# 10th percentile as the definition for use in the subsequent analysis and
+# creates a `data/processed/frontier_info` folder, in which the 'frontier' is
+# tracked throughout each subsequent step of its calculation (i.e., scripts
+# with prefix 2-).
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -95,6 +102,8 @@ sarahSave("frontier_info_1", folder = "data/processed/frontier_info")
 
 # 4 Graphing --------------------------------------------------------------
 
+exit()
+
 # * 4.1 A - Distribution --------------------------------------------------
 
 ggdata <- ghe_recoded %>%
@@ -142,7 +151,7 @@ for(i in unique(ggdata$causename)){
                                    label = paste("10th percentile:", format(round(frontier), big.mark = ",", trim = TRUE))),
                hjust = 0, vjust = 0.5, label.size = 0, label.padding = unit(0.1, "lines"), family = "Barlow") +
     labs(title = paste(id, i), subtitle = "2019") +
-    scale_x_continuous("Mortality rate (per 100K)", labels = label_number_si()) +
+    scale_x_continuous("Mortality rate (per 100K)", labels = label_number(scale_cut = cut_short_scale())) +
     scale_y_continuous("Density", expand = expansion(mult = c(0, 0.05))) +
     scale_color_manual("Age group", values = colors$colors) +
     scale_fill_manual("Age group", values = alpha(colors$fills, 0.8)) +
@@ -150,7 +159,7 @@ for(i in unique(ggdata$causename)){
 
 }
 
-saveGGplot(x = grobs, name = "2-1_frontier-definition_A.pdf",
+saveGGplot(x = grobs, name = "2-1_frontier-definition_distribution.pdf",
            folder = "output/figures", width = 12, height = 10, multipage = TRUE)
 
 
@@ -233,7 +242,7 @@ for(parent in unique(ggdata$parent_causename)[!is.na(unique(ggdata$parent_causen
 
 }
 
-saveGGplot(x = grobs, name = "2-1_frontier-definition_B.pdf",
+saveGGplot(x = grobs, name = "2-1_frontier-definition_lines.pdf",
            folder = "output/figures",
            width = 12, height = 6, multipage = TRUE)
 
