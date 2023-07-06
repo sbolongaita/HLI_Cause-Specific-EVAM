@@ -1,7 +1,11 @@
+.DS_Store
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
+.Rprofile
 
 data/
 output/
+ad hoc/ 
