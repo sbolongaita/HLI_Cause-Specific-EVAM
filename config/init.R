@@ -9,15 +9,15 @@ rm(list = ls())
 # Loading project packages
 
 # Installing and loading SarahB package
-if(!require("devtools")) install.packages(devtools); library(devtools)
-if(!require("SarahB")) devtools::install_github("sbolongaita/SarahB"); library(SarahB)
+if(!require("devtools")) install.packages("devtools"); library(devtools)
+# if(!require("SarahB")) devtools::install_github("sbolongaita/SarahB"); library(SarahB)
 
 # Defining other packages for installation and loading
 packages <- c(
   # A, B, C, D
   "colorspace", "countrycode", "cowplot", "DescTools", "devtools",
   # E, F, G, H
-  "extrafont", "foreign", "ggplot2", "ggrepel", "ggsci", "ggthemes", "ggpubr", "grid",
+  "extrafont", "foreign", "ggnewscale", "ggplot2", "ggrepel", "ggsci", "ggpubr", "ggthemes", "grid",
   "gridExtra", "gtools", "haven", "Hmisc",
   # I, J, K, L
   # M, N, O, P
@@ -28,8 +28,23 @@ packages <- c(
   "dplyr", "base"
 )
 
+loadPackages <- function(packages){
+
+  if(any(c("dplyr", "plyr") %in% packages)){
+    a <- unique(c("plyr", packages[!(packages %in% c("dplyr", "plyr"))], "dplyr"))
+  }else{
+    a <- packages
+  }
+
+  b <- a[!(a %in% utils::installed.packages()[, "Package"])]
+  if(length(b))
+    utils::install.packages(b, dependencies = TRUE,
+                            repos = c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
+  sapply(packages, require, character.only = TRUE)
+}
+
 # Loading packages
-SarahB::loadPackages(packages)
+loadPackages(packages)
 
 
 

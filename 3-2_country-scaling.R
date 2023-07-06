@@ -3,7 +3,9 @@
 
 # This script takes the projected country mortality rates and scales them
 # with the demographic longevity frontiers of the accompanying HLI paper,
-# Chang et al. (2022), based on UN Population data.
+# Chang et al. (2023).
+
+
 
 # 1 Loading data ----------------------------------------------------------
 
@@ -12,7 +14,8 @@ applyEnv()
 
 # Loading data
 sarahLoad(c("country_info", "country_projected",
-            "country_projection_info/country_projection_info_1", "population"), folder = "data/processed")
+            "country_projection_info/country_projection_info_1"),
+          folder = "data/processed")
 envelope <- read.csv("data/input/chang_country.csv", as.is = TRUE) %>%
   filter(year >= 2000) %>%
   mutate(ghecause = 0, reference = mxn * 100000) %>%
@@ -30,7 +33,8 @@ country_projected %<>%
 
 data <- left_join(country_projected, envelope,
                   by = c("iso3", "year", "sex", "age", "ghecause")) %>%
-  left_join(cause_hierarchy %>% select(ghecause, parent_ghecause, parent_causename, level),
+  left_join(cause_hierarchy %>%
+              select(ghecause, parent_ghecause, parent_causename, level),
             by = "ghecause") %>%
   mutate(dths_rate = ifelse(!is.na(reference), reference, dths_rate)) %>%
   select(-reference) %>%
@@ -64,7 +68,8 @@ scaled <- bind_rows(scaled, lvl3)
 # * 2.5 Arranging data ----------------------------------------------------
 country_scaled <- scaled %>%
   select(iso3, year, sex, age, ghecause, causename, dths_rate) %>%
-  arrange(iso3, year, age, ghecause, sex)
+  arrange(iso3, year, age, ghecause, sex) %>%
+  ungroup()
 
 
 # * 2.6 Checking scaling --------------------------------------------------
@@ -75,7 +80,8 @@ concerns <- list()
 for(i in levels){
 
   check <- country_scaled %>%
-    left_join(cause_hierarchy %>% select(ghecause, mece = !!as.name(i)), by  = "ghecause") %>%
+    left_join(cause_hierarchy %>% select(ghecause, mece = !!as.name(i)),
+              by  = "ghecause") %>%
     filter(mece) %>%
     group_by(iso3, year, sex, age) %>%
     dplyr::summarize(lower_summed = sum(dths_rate), .groups = "drop") %>%
@@ -100,119 +106,9 @@ sarahSave("country_scaled", folder = "data/processed")
 country_projection_info_2 <- country_projection_info_1 %>%
   full_join(country_scaled %>% dplyr::rename(scaled = dths_rate),
             by = c("year", "iso3", "sex", "age", "ghecause", "causename")) %>%
-  arrange(iso3, age, ghecause, year, sex)
+  arrange(iso3, age, ghecause, year, sex) %>%
+  ungroup()
 
 # __+ country_projection_info_2 --------------------------------------------
-sarahSave("country_projection_info_2", folder = "data/processed/country_projection_info")
-
-
-exit()
-# 3 Graphing --------------------------------------------------------------
-
-iso3s <- population %>%
-  filter(year == max(year), iso3 %notin% c("IND", "CHN")) %>%
-  group_by(iso3) %>%
-  summarize(pop = sum(pop)) %>%
-  arrange(desc(pop)) %>%
-  slice_head(n = 5) %>%
-  pull(iso3)
-
-ggdata <- country_projection_info_2 %>%
-  filter(age >= 30, iso3 %in% iso3s) %>%
-  mutate(age.ind = ifelse(age < 60, 1, 2)) %>%
-  mutate(age = makeAgeGroup(age)) %>%
-  pivot_longer(cols = c(base, projected, scaled), names_to = "stage", values_to = "dths_rate") %>%
-  filter(!is.na(dths_rate)) %>%
-  mutate(sex = ifelse(sex == 1, "Males", "Females"),
-         stage = capitalize(stage),
-         dths_rate = ifelse(dths_rate < 0.1, 0, dths_rate)) %>%
-  mutate(stage = factor(stage, levels = c("Base", "Projected", "Scaled")),
-         zero = dths_rate == 0)
-
-colors <- colorFunct(n = length(unique(ggdata$stage)), names = levels(ggdata$stage), color.and.fill = TRUE)
-
-for(j in unique(ggdata$iso3)){
-
-  country <- country_info$country[country_info$iso3 == j]
-  ggdata2 <- ggdata %>% filter(iso3 == j)
-
-  grobs <- list()
-  for(i in unique(ggdata$causename)){
-
-    id <- ids[which(unique(ggdata$causename) == i)]
-    ggdata3 <- ggdata2 %>% filter(causename == i)
-
-    panels <- list()
-    for(k in unique(ggdata$sex)){
-
-      ggdata4 <- ggdata3 %>% filter(sex  == k)
-      ylims <- ggRange(ggdata4$dths_rate)
-      if(ylims[1] <= 0){
-        ylims <- c(0.1, ylims[2])
-      }
-
-      rows <- list()
-      for(l in unique(ggdata$age.ind)){
-
-        ggdata5 <- ggdata4 %>% filter(age.ind == l)
-        ggdata_points <- ggdata5 %>% filter(year >= 2000, year < 2020, stage != "Projected")
-        ggdata_lines <- ggdata5 %>% filter(year > 2019, year <= 2040)
-
-        rows[[as.character(l)]] <- ggplot(ggdata5) +
-          facet_wrap(~ age, nrow = 1) +
-          geom_line(data = ggdata_lines, aes(x = year, y = dths_rate, color = stage), size = 0.75) +
-          geom_point(data = ggdata_points,
-                     aes(x = year, y = dths_rate, color = stage, fill = stage), pch = 21) +
-          scale_x_continuous("Year", limits = c(1995, 2045),
-                             breaks = seq(2000, 2040, 10), labels = c("2000", "'10", "'20", "'30", "'40")) +
-          scale_y_continuous("Frontier mortality rate\n(per 100K, log scale)", trans = "log",
-                             limits = ylims, breaks = log.breaks, labels = log.labels) +
-          scale_color_manual("Frontier estimation stage", values = colors$colors) +
-          scale_fill_manual("Frontier estimation stage", values = colors$fills) +
-          theme(legend.position = "bottom") +
-          guides(color = guide_legend(title.position = "bottom",
-                                      override.aes = list(pch = c(21, NA, 21))))
-
-        if(k == "Males"){
-          if(l == 1){
-            rows[[as.character(l)]] <- rows[[as.character(l)]] +
-              labs(title = paste(id, paste0(country, ": ", i)), subtitle = k) +
-              theme(axis.title.x = element_blank())
-          }else{
-            rows[[as.character(l)]] <- rows[[as.character(l)]] +
-              theme(axis.title.x = element_blank())
-          }
-        }else{
-            if(l == 1){
-              rows[[as.character(l)]] <- rows[[as.character(l)]] +
-                labs(subtitle = k) +
-                theme(axis.title.x = element_blank())
-            }
-        }
-
-      }
-
-      rows[["space"]] <- ""
-      Rows <- list("1" = rows[["1"]], "space" = rows[["space"]], "2" = rows[["2"]])
-
-      # Combining rows
-      if(k == "Males"){
-        panels[[k]] <- ggarrange(plotlist = Rows, ncol = 1, align = "hv", heights = c(1, -0.2, 1),
-                                 legend = "none")
-      }else{
-        panels[[k]] <- ggarrange(plotlist = Rows, ncol = 1, align = "hv", heights = c(1, -0.2, 1),
-                                 common.legend = TRUE, legend = "bottom")
-      }
-
-    }
-
-    # Combining panels
-    grobs[[i]] <- ggarrange(plotlist = panels, ncol = 1, align = "hv")
-
-  }
-
-  filename <- gsub("ISO", j, "3-2_country-scaling_ISO.pdf")
-  saveGGplot(x = grobs, filename, folder = "output/figures",
-             width = 12, height = 12, multipage = TRUE)
-
-}
+sarahSave("country_projection_info_2",
+          folder = "data/processed/country_projection_info")

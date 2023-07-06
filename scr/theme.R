@@ -7,21 +7,21 @@ library(utils)
 
 # The `extrafont` package was buggy at the time I wrote this script; an older
 # version of the `Rttf2pt1` package is necessary.
-if(utils::packageVersion("Rttf2pt1") != "1.3.8"){
-  utils::remove.packages("Rttf2pt1")
-  remotes::install_version("Rttf2pt1", version = "1.3.8")
-}
+# if(utils::packageVersion("Rttf2pt1") != "1.3.8"){
+#   utils::remove.packages("Rttf2pt1")
+#   remotes::install_version("Rttf2pt1", version = "1.3.8")
+# }
 
 # The font included in this `ggplot` theme will not work if you do not have it
 # installed on your computer. It is a free Google font available here: https://fonts.google.com/specimen/Barlow
-if(!"Barlow" %in% extrafont::fonts()){
-  sysfonts::font_add_google("Barlow")
-  extrafont::font_import(pattern = "Barlow", prompt = FALSE)
-  extrafont::loadfonts(device = "pdf", quiet = TRUE)
-}
+# if(!"Barlow" %in% extrafont::fonts()){
+#   sysfonts::font_add_google("Barlow")
+#   extrafont::font_import()
+#   extrafont::loadfonts(device = "pdf", quiet = TRUE)
+# }
 
 # Defining the ggplot theme
-barlow <- theme(
+theme <- theme(
   # Base settings
   rect = element_rect(fill = NA, color = NA),
   text = element_text(family = "Barlow", face = "plain", size = 11),
@@ -33,15 +33,16 @@ barlow <- theme(
   plot.caption = element_text(size = 11, margin = margin(10, 0, 0, 0), hjust = 0),
   # Panel settings
   panel.background = element_rect(fill = "white", color = NA),
-  panel.grid.major = element_line(color = alpha("black", 0.2), size = 0.2),
-  panel.grid.minor.y = element_line(color = alpha("black", 0.2), size = 0.2),
+  panel.grid.major = element_line(color = alpha("black", 0.2), linewidth = 0.2),
+  panel.grid.minor = element_blank(),
+  # panel.grid.minor.y = element_line(color = alpha("black", 0.2), linewidth = 0.2),
   panel.spacing = unit(10, units = "pt"),
   # Axis settings
   axis.title.x = element_text(size = 12, margin = margin(10, 0, 0, 0)),
   axis.title.y = element_text(size = 12, margin = margin(0, 10, 0, 0), angle = 90),
   axis.text = element_text(),
-  axis.line = element_line(color = alpha("black", 0.8), size = 0.2),
-  axis.ticks = element_line(color = alpha("black", 0.2), size = 0.2),
+  axis.line = element_line(color = alpha("black", 0.8), linewidth = 0.2),
+  axis.ticks = element_line(color = alpha("black", 0.2), linewidth = 0.2),
   # Legend settings
   legend.title = element_text(size = 12),
   legend.text = element_text(),
@@ -57,4 +58,4 @@ barlow <- theme(
 )
 
 # Setting the ggplot theme
-theme_set(barlow)
+theme_set(theme)

@@ -1,10 +1,12 @@
 
-### 1.3 GHE Recode
+### 1.3 GHE recode
 
-# This script recodes the processed GHE cause of death data (limited to
+# This script recodes the processed GHE cause of death data (i.e., limited to
 # analysis countries in `1-1_country-eligibility.R`) so that causes of
 # death are relevant for this analysis, mutually exclusive, and collectively
-# exhaustive. This script relies a cause recode map created in `scr/ghe_recode.R`.
+# exhaustive. This script relies a cause recode map created in
+# `scr/non-init/ghe_recode.R`.
+
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -13,13 +15,16 @@
 applyEnv()
 
 # Loading data
-sarahLoad(c("ghe", "cause_recode_map"), folder = "data/processed")
+base::load("data/processed/ghe.rda")
+base::load("data/processed/cause_recode_map.rda")
+
 
 
 # 2 Recoding causes -------------------------------------------------------
 
 temp1 <- full_join(ghe,
-                   cause_recode_map %>% rename(ghecause = original_ghecause, causename = original_causename),
+                   cause_recode_map %>% rename(ghecause = original_ghecause,
+                                               causename = original_causename),
                    by = c("ghecause", "causename"))
 
 temp2 <- temp1 %>%
@@ -28,7 +33,10 @@ temp2 <- temp1 %>%
   summarize(dths = sum(dths), .groups = "drop")
 
 ghe_recoded <- temp2 %>%
-  rename(ghecause = recoded_ghecause, causename = recoded_causename)
+  rename(ghecause = recoded_ghecause, causename = recoded_causename) %>%
+  ungroup()
+
+
 
 # 3 Checking recode -------------------------------------------------------
 
@@ -47,7 +55,7 @@ recoded <- temp2 %>%
 # Checking that deaths under original causes (with unused lower level causes
 # omitted) equal deaths under recoded causes
 check <- full_join(original, recoded, by = c("iso3", "year", "sex", "age")) %>%
-  filter(round(dths.x - dths.y) != 0)
+  filter(round(dths.x / dths.y) != 1)
 
 # __+ ghe_recoded ---------------------------------------------------------
 sarahSave("ghe_recoded", folder = "data/processed")

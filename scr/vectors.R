@@ -3,6 +3,10 @@ base::load("data/processed/cause_hierarchy.Rda")
 # Sex-specific causenames
 sex.specific <- c("Breast cancer", "Cervix uteri cancer")
 
+# Focus causenames
+focus <- c("All causes", "Communicable, maternal, perinatal and nutritional conditions",
+           "Cardiovascular diseases", "Malignant neoplasms", "Injuries")
+
 # Causename levels
 causename.levels <- as.character(cause_hierarchy$causename)
 causename.levels2 <- ifelse(causename.levels %in% sex.specific, paste(causename.levels, "(females)"), causename.levels)
@@ -22,3 +26,6 @@ symbols <- c("\u002A", "\u2020", "\u2021", "\u00A7", "\u002A\u002A", "\u2021\u20
 
 # Figure panel ids
 ids <- paste0("(", c(LETTERS, paste0("A", LETTERS)), ") ")
+
+# Covid years
+covid <- c(2020, 2021, 2022, 2023)

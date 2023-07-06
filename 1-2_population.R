@@ -21,13 +21,26 @@ population <- read.csv("data/input/population.csv", as.is = TRUE)
 
 # Filtering population data to countries and years of interest and reformatting
 # to long data
-population <- country_info %>%
+temp1 <- country_info %>%
   filter(analysis_eligible) %>%
   select(region, iso3) %>%
   left_join(population, by = "iso3") %>%
   dplyr::select(region, iso3, year, age, sex, pop) %>%
-  arrange(iso3, year, sex, age)
+  arrange(iso3, year, sex, age) %>%
+  ungroup()
 
+# Adding in World region
+temp2 <- temp1 %>%
+  mutate(region = "World")
+
+# Ensuring equivalence between regions and world
+check1 <- temp1 %>% select(-region)
+check2 <- temp2 %>% select(-region)
+all.equal(check1, check2)
+
+# Combining
+population <- bind_rows(temp1, temp2) %>%
+  arrange(region, iso3, year, sex, age)
 
 # __+ population ----------------------------------------------------------
 sarahSave("population", folder = "data/processed")

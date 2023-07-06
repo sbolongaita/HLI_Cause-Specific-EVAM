@@ -1,13 +1,13 @@
 
-### 1.1 Country Eligibility
+### 1.1 Country eligibility
 
 # This script defines and applies the eligibility criteria for country
-# inclusion in the analysis. Countries were eligible for inclusion if
-# they had populations of at least five million in 2019 and available income
-# (i.e., GNI per capita) data for 2019. Of those countries with populations
-# of at least five million and available income data, a smaller subset were
-# eligible for the frontier analysis: those with high-quality vital
-# registration data and which were not excluded from the GHE 2019 analysis.
+# inclusion in the analysis. Countries were eligible for inclusion if they
+# had populations of at least five million in 2019 and available income
+# (i.e., GNI per capita) data for 2019. Of those analysis-eligible countries,
+# a smaller subset were eligible for the frontier analysis: those with
+# high-quality vital registration data and which were not excluded from
+# the GHE 2019 analysis.
 
 
 
@@ -24,6 +24,7 @@ for(name in names){
     dfs <- list()
     for(file in files){
       dfs[[file]] <- read.csv(file, as.is = TRUE)
+      cat(paste(file, "loaded\n"))
     }
     df <- bind_rows(dfs)
     assign(name, df)
@@ -36,10 +37,10 @@ for(name in names){
 
 # 2 Defining inclusion criteria -------------------------------------------
 
-# Extracting the starting list of countries (countries in the GHE dataset) and
-# combining with the HLI region data
+# Extracting the starting list of countries (countries in the GHE dataset)
+# and combining with the HLI region data
 temp1 <- data.frame(iso3 = sort(unique(ghe$iso3))) %>%
-  left_join(region, by = "iso3") %>%
+  left_join(region %>% filter(region != "World"), by = "iso3") %>%
   mutate(country = getCountry(iso3)) %>%
   dplyr::select(region, iso3, country)
 
@@ -83,7 +84,8 @@ temp3 <- temp2 %>%
 
 # Creating a data frame with information on all countries
 country_info <- temp3 %>%
-  dplyr::select(iso3, country, region, analysis_eligible, frontier_eligible, frontier_exclusion)
+  dplyr::select(iso3, country, region, analysis_eligible, frontier_eligible, frontier_exclusion) %>%
+  ungroup()
 
 # __ + country_info -------------------------------------------------------
 sarahSave("country_info", folder = "data/processed")
@@ -94,7 +96,8 @@ sarahSave("country_info", folder = "data/processed")
 
 # Creating a GHE dataset with analysis countries
 ghe %<>%
-  filter(iso3 %in% country_info$iso3[country_info$analysis_eligible])
+  filter(iso3 %in% country_info$iso3[country_info$analysis_eligible]) %>%
+  ungroup()
 
 # __+ ghe -----------------------------------------------------------------
 sarahSave("ghe", folder = "data/processed")

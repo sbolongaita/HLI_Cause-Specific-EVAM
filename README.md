@@ -1,6 +1,6 @@
 ## Healthy Longevity Initiative
 
-# The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions
+# The economic value associated with avoidable mortality: a systematic assessment by cause of death across world regions
 
 Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup>2</sup>, Diego S. Cardoso<sup>3</sup>, Gretchen A. Stevens<sup>4</sup>
 
@@ -11,7 +11,8 @@ Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup
 
 ## Description
 
-This Git Hub repository contains the analysis code for an academic paper entitled, *The economic value associated with non-communicable disease mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative in 2022 and published in [journal] on [date].
+This Git Hub repository contains the analysis code for a working paper, entitled *The economic value associated with avoidable mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative. A shortened version of this paper, entitled *Quantifying the economic value of non-communicable disease and injury mortality: 
+regional estimates by death cause, 2000-2050*, also based on this analysis, was published in [journal] on [date].
 
 The input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/hkkbubjtbnxj070/AACpj4CQk6dyKpIJ63XVX4Ola?dl=0).
 
@@ -63,15 +64,14 @@ This script filters the input population data to the countries of interest based
 
 **Objective:** Recode the GHE cause of death data so that causes of death are relevant for this analysis, mutually exclusive, and collectively exhaustive
 
-This script recodes the processed GHE cause of death data (limited to analysis countries) so that causes of death are relevant for this analysis, mutually exclusive, and collectively exhaustive. This script then creates two reference data frames: one which defines the organizational hierarchy of recoded causes and the other which contains a recode map.
+This script recodes the processed GHE cause of death data (i.e., limited to analysis countries in `1-1_country-eligibility.R`) so that causes of death are relevant for this analysis, mutually exclusive, and collectively  exhaustive. This script relies a cause recode map created in `scr/non-init/ghe_recode.R`.
 
 **Input:**
 -   `data/processed/ghe.Rda`
+-   `data/processed/cause_recode_map.Rda`
 
 **Output:**
 -   `data/processed/ghe_recoded.Rda`
--   `data/processed/cause_hierarchy.Rda`
--   `data/processed/cause_recode_map.Rda`
 
 ## 2. Frontier Analysis
 
@@ -81,9 +81,9 @@ Scripts with prefix `2-` analyze and develop the age- and cause-specific mortali
 
 **Script:** `2-1_frontier-definition.R`
 
-****Objective:**** Extract and compare two definitions of the frontier: the minimum and the 10th percentile of age-cause-specific mortality.
+****Objective:**** Extract three definitions of the frontier: the minimum, the 10th percentile, and the 20th percentile of age-cause-specific mortality
 
-This script takes the recoded GHE data for frontier-eligible countries, calculates age-cause-specific mortality rates, and the extracts the frontier using two definitions: the minimum and the 10th percentile. It selects the 10th percentile as the definition for use in the subsequent analysis and creates a `data/processed/frontier_info` folder, in which the 'frontier' is tracked throughout each subsequent step of its calculation (i.e., scripts with prefix `2-`).
+This script takes the recoded GHE data for frontier-eligible countries, calculates age-cause-specific mortality rates, and the extracts the frontier using three definitions: the minimum, the 10th percentile, and the 20th percentile. It creates a `data/processed/frontier_info` folder, in which  the 'frontier' is tracked throughout each subsequent step of its calculation (i.e., scripts with prefix 2-).
 
 ****Input:****
 
@@ -95,15 +95,15 @@ This script takes the recoded GHE data for frontier-eligible countries, calculat
 ****Output:****
 
 -   `data/processed/frontier_base.Rda`
--   `data/processed/frontier/info/frontier_info_1.Rda`
+-   `data/processed/frontier_info/frontier_info_1.Rda`
 
 ### 2-2. Frontier harmonization
 
 **Script:** `2-2_frontier-harmonization.R`
 
-****Objective:**** Extract the 10th percentile of age-cause-specific mortality (i.e., the frontier).
+****Objective:**** Harmonize (scale) the frontier, such that mortality rates of lower level causes sum to mortality rates of higher level causes
 
-This script harmonizes (or scales) the frontier using a level-wise approach, such that mortality rates of lower level causes of death sum to mortality rates pf higher level causes of death.
+This script harmonizes (or scales) the frontier using a level-wise approach, such that mortality rates of lower level causes of death sum to mortality rates of higher level causes of death. This script relies a function (`harmonize`) created in `scr/harmonize.R`.
 
 ****Input:****
 
@@ -120,9 +120,9 @@ This script harmonizes (or scales) the frontier using a level-wise approach, suc
 
 **Script:** `2-3_frontier-projection.R`
 
-**Objective:** Project the age-cause-specific mortality frontiers into the future (2045)
+**Objective:** Project the age-cause-specific mortality frontiers into the future (2050)
 
-This script takes the harmonized frontier mortality rates for 2010-2019 and projects them into the future using ordinary least squares (OLS) linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case the average mortalityrate from 2010-2019 is used.
+This script takes the harmonized frontier mortality rates for 2010-2019 and projects them into the future using ordinary least squares (OLS) linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case the average mortality rate from 2010-2019 is used.
 
 **Input:**
 -   `data/processed/frontier_base.Rda`
@@ -140,12 +140,13 @@ This script takes the harmonized frontier mortality rates for 2010-2019 and proj
 
 **Script:** `2-4_frontier_scaling.R`
 
-**Objective:** Scale the age-cause-specific mortality frontiers with Chang et al. (2022) longevity frontiers
+**Objective:** Scale the age-cause-specific mortality frontiers with Chang et al. (2023) all-cause frontiers
 
-This script takes the harmonized and projected frontier mortality rates and scales them with the demographic longevity frontiers of the accompanying HLI paper, Chang et al. (2022), based on UN Population data. 
+This script takes the harmonized and projected frontier mortality rates and scales them with the all cause frontiers of the accompanying HLI paper, Chang et al. (2023), based on UN Population data. 
 
 **Input:**
 -   `data/processed/cause_hierarchy.Rda`
+-   `data/processed/frontier_harmonized.Rda`
 -   `data/processed/frontier_projected.Rda`
 -   `data/processed/frontier_info/frontier_info_4.Rda`
 -   `data/input/chang_frontier.csv`
@@ -153,24 +154,7 @@ This script takes the harmonized and projected frontier mortality rates and scal
 **Output:**
 -   `data/processed/chang_scaling_factors.Rda`
 -   `data/processed/frontier_scaled.Rda`
-
-### 2-5. Frontier lagging
-
-**Script:** `2-5_frontier_lagging.R`
-
-**Objective:** Lag the age-cause-specific mortality frontiers by 5-years
-
-This script takes the harmonized, projected, and scaled frontier mortality rates and lags them by 5 years (such that the frontier mortality rate for 2020 becomes the frontier mortality rate for 2015). 
-
-**Input:**
 -   `data/processed/frontier_info/frontier_info_4.Rda`
--   `data/processed/frontier_projected.Rda`
-
-**Output:**
--   `data/processed/frontier_lagged.Rda`
--   `data/processed/frontier_info/frontier_info_5.Rda`
--   `data/processed/frontier_info/frontier_info.Rda`
--   `data/processed/frontier_info.Rda`
 
 ## 3. Country and Region Analyses
 
@@ -178,7 +162,7 @@ This script takes the harmonized, projected, and scaled frontier mortality rates
 
 **Script:** `3-1_country-projection.R`
 
-**Objective:** Project the country age-cause-specific mortality rates into the future (2045)
+**Objective:** Project the country age-cause-specific mortality rates into the future (2050)
 
 This script takes country mortality rates for 2000-2019 and projects them into the future using ordinary least squares linear regression, unless there are stochastic concerns or a positive trend line from the regression, in which case an average is used. This method is the same as the method used for the frontier projections.
 
@@ -189,7 +173,7 @@ This script takes country mortality rates for 2000-2019 and projects them into t
 
 **Output:**
 -   `data/processed/country_projected.Rda`
--   `data/processed/country_projection_info.Rda`
+-   `data/processed/country_projection_info/country_projection_info_1.Rda`
 
 ### 3-2. Country scaling
 
@@ -197,18 +181,17 @@ This script takes country mortality rates for 2000-2019 and projects them into t
 
 **Objective:** Scale country mortality rates with Chang et al. (2022) longevity frontiers
 
-This script takes the projected country mortality rates and scales them with the demographic longevity frontiers of the accompanying HLI paper, Chang et al. (2022), based on UN Population data. 
+This script takes the projected country mortality rates and scales them with the demographic longevity frontiers of the accompanying HLI paper, Chang et al. (2023). 
 
 **Input:**
 -   `data/processed/country_info.Rda`
 -   `data/processed/country_projected.Rda`
 -   `data/processed/country_projection_info/country_projection_info_1.Rda`
--   `data/processed/population.Rda`
 -   `data/input/chang_country.csv`
 
 **Output:**
 -   `data/processed/country_scaled.Rda`
--   `data/processed/country_projection_info_2`
+-   `data/processed/country_projection_info/country_projection_info_2.Rda`
 
 ## 4. Calculations
 
@@ -218,15 +201,48 @@ This script takes the projected country mortality rates and scales them with the
 
 **Objective:** Calculate the value of eliminating avoidable mortality by cause
 
-This script takes the lagged frontier and the scaled country projections and calculates the value of eliminating avoidable mortality by cause and region.
+This script takes the 10th percentile frontier and the scaled country projections and calculates the value of eliminating avoidable mortality  by cause and country/region.
 
 **Input:**
--   `data/input/chang_envelopes-baseline.csv`
 -   `data/processed/country_info.Rda`
 -   `data/processed/country_scaled.Rda`
--   `data/processed/frontier_lagged.Rda`
+-   `data/processed/frontier_scaled.Rda`
 -   `data/processed/population.Rda`
+-   `data/input/chang_envelope.csv`
 
 **Output:**
 -   `data/processed/country_calculations.Rda`
+-   `output/data/country_calculations.Rda`
+-   `output/data/country_calculations.csv`
 -   `data/processed/region_calculations.Rda`
+-   `output/data/region_calculations.Rda`
+-   `output/data/region_calculations.csv`
+-   `data/processed/roc.Rda`
+-   `output/data/roc.Rda`
+-   `output/data/roc.xlsx`
+
+### 4-2. Sensitivity analyses
+
+**Script:** `4-sensitivity-analyses.Rda`
+
+**Objective:** Conduct sensitivity analyses
+
+This script runs several sensitivity analyses: (1) using the minimum of cause-specific mortality rates as the frontier (instead of the 10th percentile); (2) varying income elasticities, to either 1.0 or 1.5; (3) varying discount rates, to either 1 or 5% per year; and using (4) using an alternative baseline VSL-to-income ratio of 100 relative to the average income among OECD countries (instead of the US VSL-to-income ratio of 160).
+
+**Input:**
+-   `data/processed/country_info.Rda`
+-   `data/processed/country_scaled.Rda`
+-   `data/processed/frontier_scaled.Rda`
+-   `data/processed/population.Rda`
+-   `data/input/chang_envelope.csv`
+
+**Output:**
+-   `data/processed/SA_country_calculations.Rda`
+-   `output/data/SA_country_calculations.Rda`
+-   `output/data/SA_country_calculations.csv`
+-   `data/processed/SA_region_calculations.Rda`
+-   `output/data/SA_region_calculations.Rda`
+-   `output/data/SA_region_calculations.csv`
+-   `data/processed/SA_roc.Rda`
+-   `output/data/SA_roc.Rda`
+-   `output/data/SA_roc.xlsx`
