@@ -163,9 +163,8 @@ v.country <- bind_rows(temp2, temp3) %>%
 SA_country_calculations <- v.country
 
 # __ + SA_country_calculations --------------------------------------------
-sarahSave("SA_country_calculations", folder = "data/processed")
 sarahSave("SA_country_calculations", folder = "output/data")
-write.csv(SA_country_calculations, file = "output/data/country_calculations.csv",
+write.csv(SA_country_calculations, file = "output/data/SA_country_calculations.csv",
           na = "", row.names = FALSE)
 
 
@@ -260,7 +259,6 @@ SA_region_calculations <- R_bar
 
 
 # __ + SA_region_calculations ---------------------------------------------
-sarahSave("SA_region_calculations", folder = "data/processed")
 sarahSave("SA_region_calculations", folder = "output/data")
 write.csv(SA_region_calculations, file = "output/data/SA_region_calculations.csv",
           na = "", row.names = FALSE)
@@ -276,6 +274,6 @@ SA_roc <- SA_region_calculations %>%
   select(scenario, region, sex, ghecause, causename, mece.lvl, roc1, roc2)
 
 # __ + SA_roc -------------------------------------------------------------
-write.xlsx(SA_roc, file = "output/data/roc.xlsx")
-sarahSave("SA_roc", folder = "data/processed")
 sarahSave("SA_roc", folder = "output/data")
+write.csv(SA_roc, file = "output/data/SA_roc.csv",
+          na = "", row.names = FALSE)

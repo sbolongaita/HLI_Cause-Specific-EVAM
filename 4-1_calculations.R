@@ -157,7 +157,6 @@ v.country <- inner_join(alpha, envelope2, by = c("iso3", "year", "age", "sex")) 
 country_calculations <- v.country
 
 # __ + country_calculations -----------------------------------------------
-sarahSave("country_calculations", folder = "data/processed")
 sarahSave("country_calculations", folder = "output/data")
 write.csv(country_calculations, file = "output/data/country_calculations.csv",
           na = "", row.names = FALSE)
@@ -250,7 +249,6 @@ region_calculations <- R_bar
 
 
 # __ + region_calculations ------------------------------------------------
-sarahSave("region_calculations", folder = "data/processed")
 sarahSave("region_calculations", folder = "output/data")
 write.csv(region_calculations, file = "output/data/region_calculations.csv",
           na = "", row.names = FALSE)
@@ -266,6 +264,6 @@ roc <- region_calculations %>%
   select(region, sex, ghecause, causename, mece.lvl, roc1, roc2)
 
 # __ + roc -----------------------------------------------------------------
-write.xlsx(roc, file = "output/data/roc.xlsx")
-sarahSave("roc", folder = "data/processed")
 sarahSave("roc", folder = "output/data")
+write.csv(roc, file = "output/data/roc.csv",
+          na = "", row.names = FALSE)
