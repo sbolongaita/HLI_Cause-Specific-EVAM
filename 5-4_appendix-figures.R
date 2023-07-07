@@ -74,7 +74,7 @@ for(parent in unique(ggdata$parent_causename)[!is.na(unique(ggdata$parent_causen
 
       saveGGplot(x = panels[[paste(id, i)]],
                  name = gsub("INFO", slug(paste0(gsub("[()]", "", id), 1)), figure_name),
-                 folder = "output/figures/appendix/FigA1 panels", width = 7.5, height = 5)
+                 folder = "output/figures/FigA1", width = 7.5, height = 5)
 
     }else{
 
@@ -86,7 +86,7 @@ for(parent in unique(ggdata$parent_causename)[!is.na(unique(ggdata$parent_causen
       h <- ceiling(length(unique(gglist[["children"]]$ghecause)) / 2) * 2.5
       saveGGplot(x = panels[[paste(id, i)]],
                  name = gsub("INFO", slug(paste0(gsub("[()]", "", id), 2)), figure_name),
-                 folder = "output/figures/appendix/FigA1 panels", width = 7.5, height = h)
+                 folder = "output/figures/FigA1", width = 7.5, height = h)
 
     }
 
@@ -167,7 +167,7 @@ for(i in unique(ggdata$causename)){
 
 }
 
-saveGGplot(grobs, figure_name, folder = "output/figures/appendix", width = 12, height = 10, multipage = TRUE)
+saveGGplot(grobs, figure_name, folder = "output/figures", width = 12, height = 10, multipage = TRUE)
 
 
 
@@ -244,7 +244,7 @@ for(i in unique(ggdata$causename)){
                     align = "hv", common.legend = TRUE, legend = "right")
 
   if(i == tail(unique(ggdata$causename), 1)){
-    saveGGplot(grobs, figure_name, folder = "output/figures/appendix", width = 11, height = 8.5, multipage = TRUE)
+    saveGGplot(grobs, figure_name, folder = "output/figures", width = 11, height = 8.5, multipage = TRUE)
   }
 
 }
@@ -338,7 +338,7 @@ for(j in unique(ggdata$region)){
 
     num <- which(unique(ggdata$region) == j) + 1; lab <- slug(j)
     figure_name2 <- gsub("-ID", paste(num, lab, sep = "_"), figure_name)
-    saveGGplot(grobs, figure_name2, folder = "output/figures/appendix", width = 15, height = 10, multipage = TRUE)
+    saveGGplot(grobs, figure_name2, folder = "output/figures", width = 15, height = 10, multipage = TRUE)
 
 }
 
@@ -404,7 +404,7 @@ for(i in unique(ggdata$mece.lvl)){
 
   num <- which(unique(ggdata$mece.lvl) == i) + 8; lab <- slug(paste("economic value lvl", i))
   figure_name2 <- gsub("-ID", paste(num, lab, sep = "_"), figure_name)
-  saveGGplot(grobs[[i]], figure_name2, "output/figures/appendix", width = 13, height = 12)
+  saveGGplot(grobs[[i]], figure_name2, "output/figures", width = 13, height = 12)
 
 }
 
@@ -470,7 +470,7 @@ for(i in unique(ggdata$mece.lvl)){
 
   num <- which(unique(ggdata$mece.lvl) == i) + 10; lab <- slug(paste("economic value dist lvl", i))
   figure_name2 <- gsub("-ID", paste(num, lab, sep = "_"), figure_name)
-  saveGGplot(grobs[[i]], figure_name2, "output/figures/appendix", width = 13, height = 12)
+  saveGGplot(grobs[[i]], figure_name2, "output/figures", width = 13, height = 12)
 
 }
 
@@ -499,7 +499,10 @@ ggdata <- SA_region_calculations %>%
   ungroup() %>%
   arrange(scenario, region, year, sex, mece.lvl, ghecause)
 
-ylims <- c(0, ggRange(ggdata$v.r, accuracy = 0.1)[2])
+ylims <- ggdata %>%
+  group_by(scenario, region, year, sex, mece.lvl) %>%
+  summarize(v.r = sum(v.r)) %>% pull(v.r) %>%
+  ggRange(accuracy = 0.1)
 
 panels <- list()
 for(i in unique(ggdata$scenario)){
@@ -540,7 +543,7 @@ for(i in unique(ggdata$scenario)){
     if(j == "Males"){
       grob <- ggarrange(plotlist = panels, ncol = 1, align = "hv", heights = c(1, -0.01, 1),
                         common.legend = TRUE, legend = "right")
-      saveGGplot(grob, gsub("-ID", id, figure_name), "output/figures/appendix",  width = 13, height = 12)
+      saveGGplot(grob, gsub("-ID", id, figure_name), "output/figures",  width = 13, height = 12)
     }
 
   }
@@ -635,7 +638,7 @@ for(i in unique(ggdata$region)){
           legend.position = "none")
 
   if(i == tail(unique(ggdata$region), 1)){
-    saveGGplot(grobs, figure_name, "output/figures/appendix", width = 10, height = 10, multipage = TRUE)
+    saveGGplot(grobs, figure_name, "output/figures", width = 10, height = 10, multipage = TRUE)
   }
 
 }

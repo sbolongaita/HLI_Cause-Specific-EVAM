@@ -10,7 +10,7 @@ applyEnv()
 
 
 
-# 2 Tab A1 Country groupings ----------------------------------------------
+# 2 Tab A1 country groupings ----------------------------------------------
 
 # Table name
 table_name <- "TabA1_country-groupings.xlsx"
@@ -57,10 +57,10 @@ write.xlsx(table, file = paste("output/tables", table_name, sep = "/"),
 
 
 
-# 3 Tab A2 cause of death crosswalk ---------------------------------------
+# 3 Tab A2 cause of death mapping ---------------------------------------
 
 # Table name
-table_name <- "TabA2_cause-crosswalk.xlsx"
+table_name <- "TabA2_cause-mapping.xlsx"
 
 # Loading data
 sarahLoad("cause_recode_map", folder = "data/processed")
@@ -139,7 +139,6 @@ table <- temp4
 
 write.xlsx(table, file = paste("output/tables", table_name, sep = "/"),
            colNames = TRUE)
-
 
 # 5 Tab B1 Economic values -------------------------------------------------
 

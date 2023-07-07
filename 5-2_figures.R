@@ -5,16 +5,16 @@ source("config/init.R")
 
 
 
-# 1 Fig 1 SSA vs frontier -------------------------------------------------
+# 1 Fig 1 LAC vs frontier -------------------------------------------------
 
 applyEnv()
 
-figure_name <- "Fig1_sub-saharan-africa-vs-frontier.pdf"
+figure_name <- "Fig1_latin-america-caribbean-vs-frontier.pdf"
 
 sarahLoad(c("cause_hierarchy", "frontier_scaled", "region"), folder = "data/processed")
 
 temp1 <- region %>%
-  filter(region == "Sub-Saharan Africa", year >= 2000, year <= 2050, age >= 20, causename %in% focus) %>%
+  filter(region == "Latin America & Caribbean", year >= 2000, year <= 2050, age >= 20, causename %in% focus) %>%
   mutate(sex = ifelse(sex == 1, "Males", "Females"),
          age2 = makeDisplayAgeGroup(age),
          age = makeAgeGroup(age),
@@ -80,7 +80,7 @@ for(i in unique(ggdata$causename)){
   if(i == tail(unique(ggdata$causename), 1)){
     grob <- ggarrange(plotlist = panels, ncol = 1, align = "hv", heights = c(1, -0.025, 1, -0.025, 1, -0.025, 1, -0.025, 1),
                       common.legend = TRUE, legend = "bottom")
-    saveGGplot(grob, figure_name, "output/figures/manuscript", width = 9, height = 12)
+    saveGGplot(grob, figure_name, "output/figures", width = 9, height = 12)
   }
 
 }
@@ -138,11 +138,10 @@ for(j in unique(ggdata$sex)){
   if(j == "Males"){
     grob <- ggarrange(plotlist = panels, ncol = 1, align = "hv", heights = c(1, -0.01, 1),
                       common.legend = TRUE, legend = "right")
-    saveGGplot(grob, figure_name, "output/figures/manuscript", width = 13, height = 12)
+    saveGGplot(grob, figure_name, "output/figures", width = 13, height = 12)
   }
 
 }
-
 
 
 
@@ -205,5 +204,5 @@ grob <- ggplot(ggdata) +
          fill = guide_legend(title.position = "bottom", ncol = 2, order = 1),
          shape = guide_legend(title.position = "bottom", nrow = 2, order = 2, override.aes = list(fill = "white")))
 
-saveGGplot(grob, figure_name, "output/figures/manuscript", width = 10, height = 14)
+saveGGplot(grob, figure_name, "output/figures", width = 10, height = 14)
 

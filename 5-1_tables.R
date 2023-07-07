@@ -1,5 +1,6 @@
 
 ### 5.1 Tables
+### Numbered according to working paper
 
 
 # 1 Tab 1 Causes of death -------------------------------------------------
@@ -7,7 +8,7 @@
 applyEnv()
 
 # Table name
-table_name <- "Tab1.xlsx"
+table_name <- "Tab1_cause-hierarchy.xlsx"
 
 # Loading data
 sarahLoad("cause_hierarchy", folder = "data/processed")
@@ -24,9 +25,42 @@ table <- temp1
 write.xlsx(table, file = paste("output/tables", table_name, sep = "/"))
 
 
+# 2 Tab 2 Economic values --------------------------------------------------
 
-# 2 Tab 2 Avoidable mortality ---------------------------------------------
+applyEnv()
 
+# Table name
+table_name <- "Tab2_economic-values.xlsx"
+
+# Loading data
+sarahLoad("region_calculations", folder = "output/data")
+
+# Calculating percentage of economic value
+temp1 <- inner_join(cause_hierarchy %>% select(prefix, ghecause, level),
+                    region_calculations, by = "ghecause") %>%
+  filter(level == mece.lvl, sex == 3) %>%
+  mutate(v.r = paste0(format(round(v.r * 100, 1), nsmall = 1, trim = TRUE), "%")) %>%
+  arrange(region, prefix) %>%
+  pivot_wider(id_cols = c(prefix, level, causename, region), names_from = year, values_from = v.r) %>%
+  group_by(region) %>%
+  group_modify(~ add_row(.x, .before = 0)) %>%
+  ungroup() %>%
+  mutate(causename = case_when(is.na(causename) ~ region,
+                               level == 1 ~ causename,
+                               level == 2 ~ paste0(tab, causename),
+                               level == 3 ~ paste0(tab, tab, causename))) %>%
+  select(-c(region, level, prefix)) %>%
+  mutate_all(~ifelse(is.na(.), "", .))
+
+table <- temp1
+
+write.xlsx(table, file = paste("output/tables", table_name, sep = "/"))
+
+
+
+# Unused: Avoidable mortality ---------------------------------------------
+
+exit()
 applyEnv()
 
 # Table name
@@ -58,7 +92,7 @@ population %<>%
 
 # Combining country and frontier data
 temp1 <- full_join(country_scaled, frontier_scaled,
-                    by = c("year", "age", "sex_match", "ghecause", "causename")) %>%
+                   by = c("year", "age", "sex_match", "ghecause", "causename")) %>%
   mutate_at(vars(dths_rate, frontier), ~ . /100000) %>%
   dplyr::select(-sex_match) %>%
   arrange(iso3, ghecause, age, sex, year)
@@ -138,38 +172,5 @@ temp6 <- full_join(cause_hierarchy %>% select(level, ghecause, causename),
   select(causename, ends_with("2000"), ends_with("2019"), ends_with("2050"))
 
 table <- temp6
-
-write.xlsx(table, file = paste("output/tables", table_name, sep = "/"))
-
-
-
-# 2 Tab 2 Economic values --------------------------------------------------
-
-applyEnv()
-
-# Table name
-table_name <- "Tab3.xlsx"
-
-# Loading data
-sarahLoad("region_calculations", folder = "output/data")
-
-# Calculating percentage of economic value
-temp1 <- inner_join(cause_hierarchy %>% select(prefix, ghecause, level),
-                    region_calculations, by = "ghecause") %>%
-  filter(level == mece.lvl, sex == 3) %>%
-  mutate(v.r = paste0(format(round(v.r * 100, 1), nsmall = 1, trim = TRUE), "%")) %>%
-  arrange(region, prefix) %>%
-  pivot_wider(id_cols = c(prefix, level, causename, region), names_from = year, values_from = v.r) %>%
-  group_by(region) %>%
-  group_modify(~ add_row(.x, .before = 0)) %>%
-  ungroup() %>%
-  mutate(causename = case_when(is.na(causename) ~ region,
-                               level == 1 ~ causename,
-                               level == 2 ~ paste0(tab, causename),
-                               level == 3 ~ paste0(tab, tab, causename))) %>%
-  select(-c(region, level, prefix)) %>%
-  mutate_all(~ifelse(is.na(.), "", .))
-
-table <- temp1
 
 write.xlsx(table, file = paste("output/tables", table_name, sep = "/"))

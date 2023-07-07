@@ -18,20 +18,23 @@ data <- inner_join(cause_hierarchy %>% select(prefix, ghecause, level),
 
 # CVD 2019
 data %>%
-  filter(causename == "Cardiovascular diseases", sex != "Total", region != "World") %>%
+  filter(causename == "Cardiovascular diseases", sex == "Total", region != "World") %>%
   arrange(v.r)
 
 # Cancers 2019
 data %>%
-  filter(causename == "Malignant neoplasms", sex != "Total", region != "World") %>%
-  arrange(desc(v.r)) %>%
-  head()
+  filter(causename == "Malignant neoplasms", sex == "Total", region %in% c("China", "High-income")) %>%
+  arrange(v.r)
 
-# Injuries 2019
+# Intentional injuries 2019
 data %>%
-  filter(causename == "Injuries", sex != "Total", region != "World") %>%
-  arrange(desc(v.r)) %>%
-  head()
+  filter(causename == "Intentional injuries", sex != "Total", region != "World") %>%
+  arrange(v.r)
+
+# Unintentional injuries 2019
+data %>%
+  filter(causename == "Unintentional injuries", sex != "Total", region != "World") %>%
+  arrange(v.r)
 
 
 # Results / Economic value of avoidable mortality -------------------------
@@ -41,33 +44,33 @@ data %>%
   filter(causename %in% c("Cardiovascular diseases", "Diabetes mellitus"), sex == "Total", region != "World") %>%
   group_by(region) %>%
   summarize(v.r = sum(v.r)) %>%
-  arrange(desc(v.r))
+  arrange(v.r)
 
 data %>%
-  filter(causename %in% c("Cardiovascular diseases", "Diabetes mellitus"), region != "World") %>%
+  filter(causename %in% c("Cardiovascular diseases", "Diabetes mellitus"), sex != "Total", region != "World") %>%
   group_by(region, sex) %>%
   summarize(v.r = sum(v.r)) %>%
-  arrange(region, sex != "Total", sex)
+  arrange(region, sex)
 
 # Malignant neoplasms by sex 2019
 data %>%
   filter(causename == "Malignant neoplasms", sex != "Total", region != "World") %>%
-  arrange(desc(v.r))
+  arrange(region, sex)
 
 # Injuries by sex 2019
 data %>%
-  filter(causename == "Injuries", region %in% c("Latin America & Caribbean", "Sub-Saharan Africa")) %>%
-  arrange(region, sex)
+  filter(causename == "Injuries", sex != "Total", region != "World") %>%
+  arrange(v.r)
 
 # Intentional injuries 2019
 data %>%
-  filter(causename == "Intentional injuries", region %in% c("Latin America & Caribbean", "Sub-Saharan Africa")) %>%
-  arrange(region, sex)
+  filter(causename == "Intentional injuries", sex != "Total", region != "World") %>%
+  arrange(v.r)
 
 # Unintentional injuries 2019
 data %>%
-  filter(causename == "Unintentional injuries", region %in% c("Latin America & Caribbean", "Sub-Saharan Africa")) %>%
-  arrange(region, sex)
+  filter(causename == "Unintentional injuries", sex != "Total", region != "World") %>%
+  arrange(v.r)
 
 # Injuries, other regions, 2019
 data %>%
@@ -86,3 +89,18 @@ data %>%
 # CVD 2019
 data %>%
   filter(causename == "Cardiovascular diseases", sex == "Total", region == "World")
+
+# CVD + diabetes 2019
+data %>%
+  filter(causename %in% c("Cardiovascular diseases", "Diabetes mellitus"), region != "World") %>%
+  group_by(region, sex) %>%
+  summarize(v.r = sum(v.r)) %>%
+  arrange(region, sex != "Total", sex)
+
+# CVD and diabetes 2019
+data %>%
+  filter(causename %in% c("Cardiovascular diseases", "Diabetes mellitus")) %>%
+  arrange(desc(v.r)) %>%
+  pivot_wider(id_cols = c(region, causename), names_from = sex, values_from = v.r) %>%
+  arrange(causename, region) %>%
+  mutate(cp = paste0(region, ": ", Females, " (F), ", Males, " (M), ", Total, " (T)"))

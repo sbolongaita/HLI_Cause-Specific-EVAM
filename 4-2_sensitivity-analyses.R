@@ -1,7 +1,13 @@
 
 ### 4.2 Sensitivity analyses
 
-# This script runs sensitivity analyses.
+# This script runs several sensitivity analyses: (1) using the minimum of
+# cause-specific mortality rates as the frontier (instead of the 10th
+# percentile); (2) varying income elasticities, to either 1.0 or 1.5; (3)
+# varying discount rates, to either 1 or 5% per year; and using (4) using
+# an alternative baseline VSL-to-income ratio of 100 relative to the
+# average income among OECD countries (instead of the US VSL-to-income
+# ratio of 160).
 
 
 # 1 Loading data ----------------------------------------------------------
@@ -30,7 +36,7 @@ country_scaled %<>%
 
 # Prepping frontier data
 frontier_scaled %<>%
-  filter(year %in% focus) %>%
+  filter(year %in% focus, definition != "20th percentile") %>%
   dplyr::select(year, age, sex_match = sex, ghecause, causename, definition, frontier) %>%
   arrange(year, age, ghecause, sex_match)
 
@@ -50,7 +56,6 @@ data <- inner_join(country_scaled, frontier_scaled,
 containsNA(data)
 
 
-
 # 3 Calculations ----------------------------------------------------------
 
 # * delta -----------------------------------------------------------------
@@ -61,6 +66,7 @@ delta <- data %>%
 
 # Checking data
 containsNA(delta)
+
 
 
 # * p ---------------------------------------------------------------------
@@ -131,13 +137,24 @@ check %>% filter(round(alpha, 4) != round(pop.sex.weight, 4))
 alpha <- p %>% left_join(alpha, by = c("iso3", "year", "age", "sex"))
 
 
+
 # * v.c --------------------------------------------------------------------
 
-v.country <- inner_join(alpha, envelope %>%
-                          select("scenario" ,"iso3", "year", "age", "sex", "b_log_1yr"),
-                        by = c("iso3", "year", "age", "sex")) %>%
-  filter((definition == "Minimum" & scenario == "Base") | (definition == "10th percentile" & scenario != "Base")) %>%
-  mutate(scenario = ifelse(scenario == "Base", "Minimum frontier definition", scenario)) %>%
+temp1 <- inner_join(alpha,
+                   envelope %>% select("scenario" ,"iso3", "year", "age", "sex", "b_log_1yr") %>% unique(),
+                   by = c("iso3", "year", "age", "sex"))
+
+temp2 <- temp1 %>%
+  filter(definition == "Minimum" & scenario == "Base") %>%
+  mutate(scenario = "Minimum frontier definition") %>%
+  select(-definition)
+
+temp3 <- temp1 %>%
+  filter(definition == "10th percentile" & scenario != "Base") %>%
+  select(-definition)
+
+v.country <- bind_rows(temp2, temp3) %>%
+  arrange(iso3, year, age, sex, ghecause, causename, scenario) %>%
   mutate(v.c = alpha * p * b_log_1yr) %>%
   group_by(scenario, iso3, year, sex, ghecause, causename, mece.lvl) %>%
   summarize(v.c = sum(v.c), .groups = "drop") %>%
@@ -245,7 +262,7 @@ SA_region_calculations <- R_bar
 # __ + SA_region_calculations ---------------------------------------------
 sarahSave("SA_region_calculations", folder = "data/processed")
 sarahSave("SA_region_calculations", folder = "output/data")
-write.csv(SA_region_calculations, file = "output/data/region_calculations.csv",
+write.csv(SA_region_calculations, file = "output/data/SA_region_calculations.csv",
           na = "", row.names = FALSE)
 
 
