@@ -211,13 +211,10 @@ This script takes the 10th percentile frontier and the scaled country projection
 -   `data/input/chang_envelope.csv`
 
 **Output:**
--   `data/processed/country_calculations.Rda`
 -   `output/data/country_calculations.Rda`
 -   `output/data/country_calculations.csv`
--   `data/processed/region_calculations.Rda`
 -   `output/data/region_calculations.Rda`
 -   `output/data/region_calculations.csv`
--   `data/processed/roc.Rda`
 -   `output/data/roc.Rda`
 -   `output/data/roc.xlsx`
 
@@ -237,12 +234,9 @@ This script runs several sensitivity analyses: (1) using the minimum of cause-sp
 -   `data/input/chang_envelope.csv`
 
 **Output:**
--   `data/processed/SA_country_calculations.Rda`
 -   `output/data/SA_country_calculations.Rda`
 -   `output/data/SA_country_calculations.csv`
--   `data/processed/SA_region_calculations.Rda`
 -   `output/data/SA_region_calculations.Rda`
 -   `output/data/SA_region_calculations.csv`
--   `data/processed/SA_roc.Rda`
 -   `output/data/SA_roc.Rda`
 -   `output/data/SA_roc.xlsx`
