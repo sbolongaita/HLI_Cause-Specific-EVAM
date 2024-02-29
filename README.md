@@ -11,8 +11,8 @@ Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup
 
 ## Description
 
-This Git Hub repository contains the analysis code for a working paper, entitled *The economic value associated with avoidable mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative. A shortened version of this paper, entitled *Quantifying the economic value of non-communicable disease and injury mortality: 
-regional estimates by death cause, 2000-2050*, also based on this analysis, was published in [journal] on [date].
+This Git Hub repository contains the analysis code for a working paper, entitled *The economic value associated with avoidable mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative. A shortened version of this paper, entitled *Quantifying the economic value of non-communicable disease and injury avoidable mortality: 
+regional estimates by death cause, 2000-2050*, also based on this analysis, is forthcoming in *Nature Medicine*.
 
 The input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/7p4w2zxwpbihhsj/AAAZAJhWgnRmaeEPgolnuvxya?dl=0).
 
