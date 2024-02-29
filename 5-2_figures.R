@@ -86,7 +86,6 @@ for(i in unique(ggdata$causename)){
 }
 
 
-
 # 2 Fig 2 Economic value --------------------------------------------------
 
 applyEnv()
@@ -205,4 +204,93 @@ grob <- ggplot(ggdata) +
          shape = guide_legend(title.position = "bottom", nrow = 2, order = 2, override.aes = list(fill = "white")))
 
 saveGGplot(grob, figure_name, "output/figures", width = 10, height = 14)
+
+
+
+
+# 4 Extended Data 1-6 -----------------------------------------------------
+
+applyEnv()
+
+figure_name <- "ED_FigNUMBER_REGION-vs-frontier.pdf"
+
+sarahLoad(c("cause_hierarchy", "frontier_scaled", "region"), folder = "data/processed")
+
+temp1 <- region %>%
+  filter(region != "Latin America & Caribbean", year >= 2000, year <= 2050, age >= 20, causename %in% focus) %>%
+  mutate(sex = ifelse(sex == 1, "Males", "Females"),
+         age2 = makeDisplayAgeGroup(age),
+         age = makeAgeGroup(age),
+         causename = factor(causename, levels = focus)) %>%
+  group_by(region, year, sex, age2, ghecause, causename) %>%
+  summarize_at(vars(dths, pop), ~sum(.), .groups = "drop") %>%
+  mutate(dths_rate = dths / pop * 100000) %>%
+  ungroup() %>%
+  select(region, year, sex.frontier = sex, age2, causename, dths_rate)
+
+temp2 <- frontier_scaled %>%
+  filter(year >= 2000, year <= 2050, age >= 20, causename %in% focus) %>%
+  mutate(sex.frontier = "Frontier",
+         age2 = makeDisplayAgeGroup(age),
+         age = makeAgeGroup(age),
+         causename = factor(causename, levels = focus)) %>%
+  group_by(year, sex, age2, ghecause, causename) %>%
+  mutate(region = "Frontier", frontier = mean(frontier)) %>%
+  ungroup() %>%
+  select(region, year, sex.frontier, age2, causename, dths_rate = frontier)
+
+ggdata <- bind_rows(temp1, temp2) %>%
+  mutate(sex.frontier = factor(sex.frontier, levels = c("Females", "Males", "Frontier")),
+         dths_rate = ifelse(year %in% covid, NA, dths_rate)) %>%
+  arrange(region, year, age2, causename, rev(sex.frontier))
+
+fills <- setNames(colorFunct(length(levels(ggdata$sex.frontier))), levels(ggdata$sex.frontier))
+colors <- setNames(darken(fills, 0.3), levels(ggdata$sex.frontier))
+
+figs <- list()
+for(j in unique(ggdata$region[ggdata$region != "Frontier"])){
+
+  panels <- list()
+  for(i in unique(ggdata$causename)){
+
+    ggdata2 <- ggdata %>% filter(region %in% c(j, "Frontier"), causename == i)
+
+    ylims <- ggRange(ggdata2$dths_rate)
+    if(ylims[1] <= 0){
+      ylims <- c(0.1, ylims[2])
+    }
+    ylab <- ifelse(i == "Cardiovascular diseases", "Mortality rate (per 100K, log scale)", "")
+
+    panels[[i]] <- ggplot(ggdata2) +
+      facet_wrap(~ age2, nrow = 1) +
+      geom_line(aes(x = year, y = dths_rate, color = sex.frontier, group = sex.frontier), alpha = 0.3) +
+      geom_line(data = subset(ggdata2, year >= 2020),
+                aes(x = year, y = dths_rate, color = sex.frontier, group = sex.frontier)) +
+      geom_point(data = subset(ggdata2, year < 2020),
+                 aes(x = year, y = dths_rate, color = sex.frontier, fill = sex.frontier),
+                 shape = 21, size = 1) +
+      labs(title = i) +
+      scale_x_continuous("", breaks = seq(2000, 2050, 10), labels = c("'00", "'10", "'20", "'30", "'40", "'50"),
+                         expand = expansion(mult = 0.1)) +
+      scale_y_continuous(ylab, trans = "log",
+                         limits = ylims, breaks = log.breaks, labels = log.labels) +
+      scale_color_manual("", values = colors) +
+      scale_fill_manual("", values = fills) +
+      theme(axis.title.x = element_blank(),
+            legend.position = "bottom")
+
+    if(i != tail(unique(ggdata$causename), 1)){
+      panels[[paste(i, "spacer")]] <- ""
+    }
+
+  }
+
+  figs[[j]] <- ggarrange(plotlist = panels, ncol = 1, align = "hv", heights = c(1, -0.025, 1, -0.025, 1, -0.025, 1, -0.025, 1),
+                         common.legend = TRUE, legend = "bottom")
+  number <- which(unique(ggdata$region[ggdata$region != "Frontier"]) == j)
+  figure_name_ <- gsub("NUMBER", number, gsub("REGION", slug(j), figure_name))
+  saveGGplot(figs[[j]], figure_name_, "output/figures", width = 9, height = 12)
+
+
+}
 

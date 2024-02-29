@@ -15,9 +15,10 @@ library(utils)
 # The font included in this `ggplot` theme will not work if you do not have it
 # installed on your computer. It is a free Google font available here: https://fonts.google.com/specimen/Barlow
 # if(!"Barlow" %in% extrafont::fonts()){
-#   sysfonts::font_add_google("Barlow")
-#   extrafont::font_import()
-#   extrafont::loadfonts(device = "pdf", quiet = TRUE)
+  # sysfonts::font_add_google("Barlow")
+  # extrafont::font_import()
+  # extrafont::loadfonts(device = "pdf", quiet = TRUE)
+  # extrafont::loadfonts(device = "all", quiet = TRUE)
 # }
 
 # Defining the ggplot theme
