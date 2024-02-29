@@ -14,7 +14,7 @@ Stéphane Verguet<sup>1</sup>, Sarah Bolongaita<sup>1</sup>, Angela Y. Chang<sup
 This Git Hub repository contains the analysis code for a working paper, entitled *The economic value associated with avoidable mortality: a systematic assessment by cause of death across world regions*, which was commissioned by the the World Bank's Healthy Longevity Initiative. A shortened version of this paper, entitled *Quantifying the economic value of non-communicable disease and injury avoidable mortality: 
 regional estimates by death cause, 2000-2050*, also based on this analysis, is forthcoming in *Nature Medicine*.
 
-The input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/7p4w2zxwpbihhsj/AAAZAJhWgnRmaeEPgolnuvxya?dl=0).
+The input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/0mhbqkhq2834ijd/AABDMWb0eTDVtaRH8CHEJbYia?dl=0).
 
 The following text provides an outline of the analysis steps and guides users through the accompanying code stored in this repository.
 
@@ -22,7 +22,7 @@ The following text provides an outline of the analysis steps and guides users th
 
 Scripts with prefix `1-` clean the data by filtering it to the countries, years, and causes of death that are relevant for the analysis.
 
-**Note:** Input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/7p4w2zxwpbihhsj/AAAZAJhWgnRmaeEPgolnuvxya?dl=0). These input data were pre-processed at basic, perfunctory level. The raw data will not be provided, however the code to pre-process the raw data can be reviewed here: `scr/raw-data-cleaning.R`.
+**Note:** Input data for this project can be found on [Dropbox](https://www.dropbox.com/sh/0mhbqkhq2834ijd/AABDMWb0eTDVtaRH8CHEJbYia?dl=0). These input data were pre-processed at basic, perfunctory level. The raw data will not be provided due to size constraints, however the code to pre-process the raw data can be reviewed here: `scr/raw-data-cleaning.R`.
 
 ### 1-1. Country eligibility
 
